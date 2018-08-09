@@ -1,0 +1,33 @@
+{
+  "name": "aws-lambda-dynamo",
+  "version": "0.0.1-alpha.1",
+  "description": "AWS Lambda / Dynamo API",
+  "main": "src/index.js",
+  "repository": "https://github.com/moroine/aws-lambda-dynamo.git",
+  "author": "moroine <moroine.bentefrit@adactive.com>",
+  "license": "MIT",
+  "private": true,
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.5",
+    "babel-preset-airbnb": "^2.5.3",
+    "clean-webpack-plugin": "^0.1.19",
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb-base": "^13.0.0",
+    "eslint-plugin-import": "^2.12.0",
+    "eslint-plugin-jest": "^21.18.0",
+    "jest": "^23.4.2",
+    "webpack": "^4.16.5",
+    "webpack-cli": "^3.1.0",
+    "webpack-merge": "^4.1.4"
+  },
+  "scripts": {
+    "build": "webpack --config build-conf/webpack.prod.js",
+    "build:dev": "webpack --config build-conf/webpack.dev.js --watch",
+    "test": "jest",
+    "lint": "eslint ."
+  },
+  "jest": {
+    "testEnvironment": "node"
+  }
+}

@@ -1,0 +1,96 @@
+# Javascript Node CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-javascript/ for more details
+#
+version: 2
+jobs:
+    lint:
+        working_directory: ~/repo
+        docker:
+            - image: circleci/node:8
+        steps:
+            - checkout
+            - restore_cache: # special step to restore the dependency cache
+                key: dependency-cache-{{ checksum "package.json" }}
+            - run: yarn install
+            - save_cache:
+                key: dependency-cache-{{ checksum "package.json" }}
+                paths:
+                - node_modules
+                - yarn.lock
+            - run: yarn run lint
+    test:
+        working_directory: ~/repo
+        docker:
+            - image: circleci/node:8
+        steps:
+            - checkout
+            - restore_cache: # special step to restore the dependency cache
+                key: dependency-cache-{{ checksum "package.json" }}
+            - run: yarn install
+            - save_cache:
+                key: dependency-cache-{{ checksum "package.json" }}
+                paths:
+                    - node_modules
+                    - yarn.lock
+            - run: yarn test --ci
+    build:
+        working_directory: ~/repo
+        docker:
+            - image: circleci/node:8
+        steps:
+            - checkout
+            - attach_workspace:
+                # Must be absolute path or relative path from working_directory
+                at: ~/repo
+            - restore_cache: # special step to restore the dependency cache
+                key: dependency-cache-{{ checksum "package.json" }}
+            - run: yarn install
+            - save_cache:
+                key: dependency-cache-{{ checksum "package.json" }}
+                paths:
+                    - node_modules
+                    - yarn.lock
+            - run: yarn run build
+            - persist_to_workspace:
+                # Must be an absolute path, or relative path from working_directory. This is a directory on the container which is
+                # taken to be the root directory of the workspace.
+                root: ~/repo
+                paths:
+                    - build
+                    - template.yaml
+    deploy:
+        working_directory: ~/repo
+        docker:
+            - image: circleci/python:2.7-jessie
+        steps:
+            - attach_workspace:
+                # Must be absolute path or relative path from working_directory
+                at: ~/repo
+            - run:
+                name: Install awscli
+                command: sudo pip install awscli aws-sam-cli
+            - run:
+                name:
+                command: sam package --template-file template.yaml --output-template-file packaged.yaml --s3-bucket aws-lambda-dynamo-code --region ap-southeast-1
+            - run:
+                name:
+                command: sam deploy --template-file packaged.yaml --stack-name aws-lambda-dynamo --capabilities CAPABILITY_IAM --region ap-southeast-1
+
+workflows:
+    version: 2
+    deploy:
+        jobs:
+            - lint
+            - test
+            - build:
+                requires:
+                    - lint
+                    - test
+            - deploy:
+                requires:
+                    - build
+                filters:
+                    branches:
+                        only:
+                            - master
