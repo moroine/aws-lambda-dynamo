@@ -11,6 +11,20 @@ Globals:
 
 Resources:
 
+  DynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: 'aws-lambda-dynamo-table'
+      AttributeDefinitions:
+      - AttributeName: id
+        AttributeType: String
+      KeySchema:
+      - AttributeName: id
+        KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+
   GetFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -20,7 +34,7 @@ Resources:
       Policies: AmazonDynamoDBReadOnlyAccess
       Environment:
         Variables:
-          TABLE_NAME: !Ref Table
+          TABLE_NAME: 'aws-lambda-dynamo-table' # !Ref DynamoDBTable
       Events:
         GetResource:
           Type: Api
@@ -34,9 +48,10 @@ Resources:
       CodeUri: build
       Handler: index.listResource
       Runtime: nodejs8.10
+      Policies: AmazonDynamoDBReadOnlyAccess
       Environment:
         Variables:
-          TABLE_NAME: !Ref Table
+          TABLE_NAME: 'aws-lambda-dynamo-table' # !Ref DynamoDBTable
       Events:
         ListResource:
           Type: Api
@@ -50,9 +65,10 @@ Resources:
       CodeUri: build
       Handler: index.postResource
       Runtime: nodejs8.10
+      Policies: AmazonDynamoDBFullAccess
       Environment:
         Variables:
-          TABLE_NAME: !Ref Table
+          TABLE_NAME: 'aws-lambda-dynamo-table' # !Ref DynamoDBTable
       Events:
         PostResource:
           Type: Api
@@ -66,9 +82,10 @@ Resources:
       CodeUri: build
       Handler: index.deleteResource
       Runtime: nodejs8.10
+      Policies: AmazonDynamoDBFullAccess
       Environment:
         Variables:
-          TABLE_NAME: !Ref Table
+          TABLE_NAME: 'aws-lambda-dynamo-table' # !Ref DynamoDBTable
       Events:
         DeleteResource:
           Type: Api

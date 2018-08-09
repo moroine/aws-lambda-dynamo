@@ -29,5 +29,8 @@
   },
   "jest": {
     "testEnvironment": "node"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.289.0"
   }
 }
