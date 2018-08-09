@@ -72,33 +72,24 @@ jobs:
                 command: sudo pip install awscli aws-sam-cli
             - run:
                 name:
-                command: sam package --template-file template.yaml --output-template-file packaged.yaml --s3-bucket aws-lambda-dynamo-code
+                command: sam package --template-file template.yaml --output-template-file packaged.yaml --s3-bucket aws-lambda-dynamo-code --region ap-southeast-1
             - run:
                 name:
-                command: sam deploy --template-file packaged.yaml --stack-name aws-lambda-dynamo --capabilities CAPABILITY_IAM
+                command: sam deploy --template-file packaged.yaml --stack-name aws-lambda-dynamo --capabilities CAPABILITY_IAM --region ap-southeast-1
 
 workflows:
     version: 2
     deploy:
         jobs:
-            - lint:
-                filters:
-                    tags:
-                        only: /.*/
-            - test:
-                filters:
-                    tags:
-                        only: /.*/
+            - lint
+            - test
             - build:
                 requires:
                     - lint
                     - test
-                filters:
-                    tags:
-                        only: /.*/
             - deploy:
                 requires:
                     - build
-                filters:
-                    tags:
-                        only: /.*/
+                branches:
+                    only:
+                        - master
