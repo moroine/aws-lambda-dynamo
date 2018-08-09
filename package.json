@@ -1,0 +1,10 @@
+{
+  "name": "aws-lambda-dynamo",
+  "version": "0.0.1-alpha.1",
+  "description": "AWS Lambda / Dynamo API",
+  "main": "index.js",
+  "repository": "https://github.com/moroine/aws-lambda-dynamo.git",
+  "author": "moroine <moroine.bentefrit@adactive.com>",
+  "license": "MIT",
+  "private": true
+}
