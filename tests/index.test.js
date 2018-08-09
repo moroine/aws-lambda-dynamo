@@ -1,12 +1,12 @@
 import { helloWorld } from '../src/index';
 
-test('helloWorld should returns "Hello World !"', () => {
+test('helloWorld should returns "Hello World from CircleCi!"', () => {
   const mockedCallback = jest.fn();
 
   const expectedResponse = {
     statusCode: 200,
     body: JSON.stringify({
-      message: 'Hello World !',
+      message: 'Hello World from CircleCi!',
     }),
   };
 
