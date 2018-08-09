@@ -1,19 +1,21 @@
-import { helloWorld } from '../src/index';
+import getResource from '../src/resources/get';
+import listResource from '../src/resources/list';
+import postResource from '../src/resources/post';
+import deleteResource from '../src/resources/delete';
+import * as index from '../src/index';
 
-test('helloWorld should returns "Hello World from CircleCi!"', () => {
-  const mockedCallback = jest.fn();
+test('Should exports "getResource"', () => {
+  expect(index.getResource).toBe(getResource);
+});
 
-  const expectedResponse = {
-    statusCode: 200,
-    body: JSON.stringify({
-      message: 'Hello World from CircleCi!',
-    }),
-  };
+test('Should exports "listResource"', () => {
+  expect(index.listResource).toBe(listResource);
+});
 
-  helloWorld(null, null, mockedCallback);
+test('Should exports "postResource"', () => {
+  expect(index.postResource).toBe(postResource);
+});
 
-  expect(mockedCallback.mock.calls).toHaveLength(1);
-  expect(mockedCallback.mock.calls[0]).toHaveLength(2);
-  expect(mockedCallback.mock.calls[0][0]).toBe(null);
-  expect(mockedCallback.mock.calls[0][1]).toEqual(expectedResponse);
+test('Should exports "deleteResource"', () => {
+  expect(index.deleteResource).toBe(deleteResource);
 });

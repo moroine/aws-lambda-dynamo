@@ -1,14 +1,4 @@
-/* eslint-disable import/prefer-default-export */
-
-const helloWorld = (event, context, callback) => {
-  callback(null, {
-    statusCode: 200,
-    body: JSON.stringify({
-      message: 'Hello World from CircleCi!',
-    }),
-  });
-};
-
-export {
-  helloWorld,
-};
+export { default as getResource } from './resources/get';
+export { default as listResource } from './resources/list';
+export { default as postResource } from './resources/post';
+export { default as deleteResource } from './resources/delete';
