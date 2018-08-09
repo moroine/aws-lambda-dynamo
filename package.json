@@ -2,14 +2,24 @@
   "name": "aws-lambda-dynamo",
   "version": "0.0.1-alpha.1",
   "description": "AWS Lambda / Dynamo API",
-  "main": "index.js",
+  "main": "src/index.js",
   "repository": "https://github.com/moroine/aws-lambda-dynamo.git",
   "author": "moroine <moroine.bentefrit@adactive.com>",
   "license": "MIT",
   "private": true,
   "devDependencies": {
+    "babel-preset-airbnb": "^2.5.3",
     "eslint": "^4.19.1",
     "eslint-config-airbnb-base": "^13.0.0",
-    "eslint-plugin-import": "^2.12.0"
+    "eslint-plugin-import": "^2.12.0",
+    "eslint-plugin-jest": "^21.18.0",
+    "jest": "^23.4.2"
+  },
+  "scripts": {
+    "test": "jest",
+    "lint": "eslint ."
+  },
+  "jest": {
+    "testEnvironment": "node"
   }
 }
