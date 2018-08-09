@@ -67,7 +67,7 @@ AWS Lambda NodeJS runtime requires a flat folder with all dependencies including
 Firstly, we need a `S3 bucket` where we can upload our Lambda functions packaged as ZIP before we deploy anything - If you don't have a S3 bucket to store code artifacts then this is a good time to create one:
 
 ```bash
-aws s3 mb s3://BUCKET_NAME
+aws s3 mb s3://aws-lambda-dynamo-code
 ```
 
 Next, run the following command to package our Lambda function to S3:
@@ -76,7 +76,7 @@ Next, run the following command to package our Lambda function to S3:
 sam package \
     --template-file template.yaml \
     --output-template-file packaged.yaml \
-    --s3-bucket REPLACE_THIS_WITH_YOUR_S3_BUCKET_NAME
+    --s3-bucket aws-lambda-dynamo-code
 ```
 
 Next, the following command will create a Cloudformation Stack and deploy your SAM resources.
@@ -84,7 +84,7 @@ Next, the following command will create a Cloudformation Stack and deploy your S
 ```bash
 sam deploy \
     --template-file packaged.yaml \
-    --stack-name sam-app \
+    --stack-name aws-lambda-dynamo \
     --capabilities CAPABILITY_IAM
 ```
 
@@ -94,7 +94,7 @@ After deployment is complete you can run the following command to retrieve the A
 
 ```bash
 aws cloudformation describe-stacks \
-    --stack-name sam-app \
+    --stack-name aws-lambda-dynamo \
     --query 'Stacks[].Outputs'
 ``` 
 
@@ -117,16 +117,16 @@ AWS CLI commands to package, deploy and describe outputs defined within the clou
 sam package \
     --template-file template.yaml \
     --output-template-file packaged.yaml \
-    --s3-bucket REPLACE_THIS_WITH_YOUR_S3_BUCKET_NAME
+    --s3-bucket aws-lambda-dynamo-code
 
 sam deploy \
     --template-file packaged.yaml \
-    --stack-name sam-app \
+    --stack-name aws-lambda-dynamo \
     --capabilities CAPABILITY_IAM \
     --parameter-overrides MyParameterSample=MySampleValue
 
 aws cloudformation describe-stacks \
-    --stack-name sam-app --query 'Stacks[].Outputs'
+    --stack-name aws-lambda-dynamo --query 'Stacks[].Outputs'
 ```
 
 **NOTE**: Alternatively this could be part of package.json scripts section.
