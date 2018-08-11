@@ -1,0 +1,13 @@
+version: '2.1'
+
+services:
+  dynamodb:
+    image: cnadiminti/dynamodb-local
+    ports:
+      - "9000:8000"
+    networks:
+      - aws-lambda-dynamo-network
+
+networks:
+  aws-lambda-dynamo-network:
+    driver: bridge

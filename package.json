@@ -25,7 +25,11 @@
     "build": "webpack --config build-conf/webpack.prod.js",
     "build:dev": "webpack --config build-conf/webpack.dev.js --watch",
     "test": "jest",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "start": "npm run start:dynamodb && npm run start:api",
+    "start:dynamodb": "docker-compose up -d",
+    "start:api": "sam local start-api --docker-network aws-lambda-dynamo-network",
+    "bootstrap:dynamodb": "./local/bootstrapLocalDynamoDb.sh"
   },
   "jest": {
     "testEnvironment": "node"
