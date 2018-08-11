@@ -11,21 +11,39 @@ Globals:
 
 Resources:
 
-  DynamoDBTable:
+  DynamoDBTableResource:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: 'aws-lambda-dynamo-table'
+      TableName: 'aws-lambda-dynamo-table-resource'
       AttributeDefinitions:
-      - AttributeName: id
+      - AttributeName: userId
+        AttributeType: S
+      - AttributeName: resourceName
         AttributeType: S
       KeySchema:
-      - AttributeName: id
+      - AttributeName: userId
+        KeyType: RANGE
+      - AttributeName: resourceId
         KeyType: HASH
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
 
-  GetFunction:
+  DynamoDBTableUser:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: 'aws-lambda-dynamo-table-user'
+      AttributeDefinitions:
+      - AttributeName: email
+        AttributeType: S
+      KeySchema:
+      - AttributeName: email
+        KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+
+  GetResourceFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: build
@@ -34,15 +52,16 @@ Resources:
       Policies: AmazonDynamoDBReadOnlyAccess
       Environment:
         Variables:
-          TABLE_NAME: 'aws-lambda-dynamo-table' # !Ref DynamoDBTable
+          TABLE_RESOURCE: 'aws-lambda-dynamo-table-resource'
+          TABLE_USER: 'aws-lambda-dynamo-table-user'
       Events:
         GetResource:
           Type: Api
           Properties:
-            Path: /resource/{resourceId}
+            Path: /resource/{userId}/{resourceId}
             Method: get
 
-  ListFunction:
+  ListResourceFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: build
@@ -51,15 +70,16 @@ Resources:
       Policies: AmazonDynamoDBReadOnlyAccess
       Environment:
         Variables:
-          TABLE_NAME: 'aws-lambda-dynamo-table' # !Ref DynamoDBTable
+          TABLE_RESOURCE: 'aws-lambda-dynamo-table-resource'
+          TABLE_USER: 'aws-lambda-dynamo-table-user'
       Events:
         ListResource:
           Type: Api
           Properties:
-            Path: /resource
+            Path: /resource/{userId}
             Method: get
 
-  PostFunction:
+  PostResourceFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: build
@@ -68,15 +88,16 @@ Resources:
       Policies: AmazonDynamoDBFullAccess
       Environment:
         Variables:
-          TABLE_NAME: 'aws-lambda-dynamo-table' # !Ref DynamoDBTable
+          TABLE_RESOURCE: 'aws-lambda-dynamo-table-resource'
+          TABLE_USER: 'aws-lambda-dynamo-table-user'
       Events:
         PostResource:
           Type: Api
           Properties:
-            Path: /resource
+            Path: /resource/{userId}
             Method: post
 
-  DeleteFunction:
+  DeleteResourceFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: build
@@ -85,16 +106,107 @@ Resources:
       Policies: AmazonDynamoDBFullAccess
       Environment:
         Variables:
-          TABLE_NAME: 'aws-lambda-dynamo-table' # !Ref DynamoDBTable
+          TABLE_RESOURCE: 'aws-lambda-dynamo-table-resource'
+          TABLE_USER: 'aws-lambda-dynamo-table-user'
       Events:
         DeleteResource:
           Type: Api
           Properties:
-            Path: /resource/{resourceId}
+            Path: /resource/{userId}/{resourceId}
+            Method: delete
+
+  GetUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: build
+      Handler: index.getUser
+      Runtime: nodejs8.10
+      Policies: AmazonDynamoDBFullAccess
+      Environment:
+        Variables:
+          TABLE_RESOURCE: 'aws-lambda-dynamo-table-resource'
+          TABLE_USER: 'aws-lambda-dynamo-table-user'
+      Events:
+        GetUer:
+          Type: Api
+          Properties:
+            Path: /user/{id}
+            Method: get
+
+  ListUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: build
+      Handler: index.listUser
+      Runtime: nodejs8.10
+      Policies: AmazonDynamoDBFullAccess
+      Environment:
+        Variables:
+          TABLE_RESOURCE: 'aws-lambda-dynamo-table-resource'
+          TABLE_USER: 'aws-lambda-dynamo-table-user'
+      Events:
+        ListUser:
+          Type: Api
+          Properties:
+            Path: /user
+            Method: get
+
+  PostUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: build
+      Handler: index.postUser
+      Runtime: nodejs8.10
+      Policies: AmazonDynamoDBFullAccess
+      Environment:
+        Variables:
+          TABLE_RESOURCE: 'aws-lambda-dynamo-table-resource'
+          TABLE_USER: 'aws-lambda-dynamo-table-user'
+      Events:
+        PostUser:
+          Type: Api
+          Properties:
+            Path: /user
+            Method: post
+
+  PatchUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: build
+      Handler: index.patchUser
+      Runtime: nodejs8.10
+      Policies: AmazonDynamoDBFullAccess
+      Environment:
+        Variables:
+          TABLE_RESOURCE: 'aws-lambda-dynamo-table-resource'
+          TABLE_USER: 'aws-lambda-dynamo-table-user'
+      Events:
+        PutUser:
+          Type: Api
+          Properties:
+            Path: /user/{id}
+            Method: patch
+
+  DeleteUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: build
+      Handler: index.deleteUser
+      Runtime: nodejs8.10
+      Policies: AmazonDynamoDBFullAccess
+      Environment:
+        Variables:
+          TABLE_RESOURCE: 'aws-lambda-dynamo-table-resource'
+          TABLE_USER: 'aws-lambda-dynamo-table-user'
+      Events:
+        DeleteUser:
+          Type: Api
+          Properties:
+            Path: /user/{id}
             Method: delete
 
 Outputs:
 
-  HelloWorldApi:
-    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
+  Api:
+    Description: "API Gateway endpoint URL"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/"

@@ -12,6 +12,7 @@
     "babel-loader": "^7.1.5",
     "babel-preset-airbnb": "^2.5.3",
     "clean-webpack-plugin": "^0.1.19",
+    "copy-webpack-plugin": "^4.5.2",
     "eslint": "^4.19.1",
     "eslint-config-airbnb-base": "^13.0.0",
     "eslint-plugin-import": "^2.12.0",
@@ -20,11 +21,13 @@
     "jest-mock-console": "^0.4.0",
     "webpack": "^4.16.5",
     "webpack-cli": "^3.1.0",
-    "webpack-merge": "^4.1.4"
+    "webpack-merge": "^4.1.4",
+    "webpack-node-externals": "^1.7.2"
   },
   "scripts": {
-    "build": "webpack --config build-conf/webpack.prod.js",
+    "build": "webpack --config build-conf/webpack.prod.js && npm run build:installDeps",
     "build:dev": "webpack --config build-conf/webpack.dev.js --watch",
+    "build:installDeps": "cd build && npm install --only=production && cd ..",
     "test": "jest",
     "lint": "eslint .",
     "start": "npm run start:dynamodb && npm run start:api",
@@ -36,6 +39,10 @@
     "testEnvironment": "node"
   },
   "dependencies": {
-    "aws-sdk": "^2.289.0"
+    "aws-sdk": "^2.289.0",
+    "base-64": "^0.1.0",
+    "bcryptjs": "^2.4.3",
+    "uuid": "^3.3.2",
+    "validator": "^10.5.0"
   }
 }

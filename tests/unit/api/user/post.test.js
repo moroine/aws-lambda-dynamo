@@ -1,10 +1,10 @@
 import mockConsole from 'jest-mock-console';
-import postResource from '../../src/resources/post';
-import { docClient, getTableName } from '../../src/resources/db';
+import postUser from '../../../../src/api/user/post';
+import { docClient, getResourceTableName } from '../../../../src/db';
 
-jest.mock('../../src/resources/db');
+jest.mock('../../../../src/db');
 
-test('Should create a new resource', (done) => {
+test('Should create a new user', (done) => {
   const resourceId = 'abc-123';
 
   const event = {
@@ -12,7 +12,7 @@ test('Should create a new resource', (done) => {
   };
 
   const TableName = 'a-custom-table-name';
-  getTableName.mockReturnValue(TableName);
+  getResourceTableName.mockReturnValue(TableName);
 
   docClient.put.mockImplementation((params, cb) => {
     expect(params).toEqual({
@@ -104,7 +104,7 @@ test('Should not create if already exists', (done) => {
   };
 
   const TableName = 'a-custom-table-name';
-  getTableName.mockReturnValue(TableName);
+  getResourceTableName.mockReturnValue(TableName);
 
   docClient.put.mockImplementation((params, cb) => {
     expect(params).toEqual({
@@ -143,7 +143,7 @@ test('Should return Internal Server Error if unexpected error happen', (done) =>
   };
 
   const TableName = 'a-custom-table-name';
-  getTableName.mockReturnValue(TableName);
+  getResourceTableName.mockReturnValue(TableName);
 
   const restoreConsole = mockConsole();
   const error = new Error('Unexpected');

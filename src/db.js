@@ -7,11 +7,15 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 const docClient = new DynamoDB.DocumentClient(options);
-const TableName = process.env.TABLE_NAME;
 
-const getTableName = () => TableName;
+const resourceTableName = process.env.TABLE_RESOURCE;
+const userTableName = process.env.TABLE_USER;
+
+const getResourceTableName = () => resourceTableName;
+const getUserTableName = () => userTableName;
 
 export {
   docClient,
-  getTableName,
+  getResourceTableName,
+  getUserTableName,
 };
