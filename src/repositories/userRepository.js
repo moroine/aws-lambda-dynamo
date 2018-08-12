@@ -10,7 +10,7 @@ const getAllUsers = () => {
     docClient.scan(params, (err, data) => {
       if (err) {
         // eslint-disable-next-line no-console
-        console.log(err);
+        console.error(err);
 
         reject(err);
       } else {
@@ -36,7 +36,7 @@ const getUserById = id => new Promise((resolve, reject) => {
   docClient.get(params, (err, data) => {
     if (err) {
       // eslint-disable-next-line no-console
-      console.log(err);
+      console.error(err);
 
       return reject(err);
     }
@@ -107,7 +107,7 @@ const deleteUser = (id) => {
     docClient.delete(params, (err) => {
       if (err) {
         // eslint-disable-next-line no-console
-        console.log(err);
+        console.error(err);
 
         reject(err);
       } else {
