@@ -1,7 +1,7 @@
 import { getAllUsers } from '../../repositories/userRepository';
 
 const listUser = (event, context, callback) => {
-  getAllUsers
+  getAllUsers()
     .then((users) => {
       callback(null, {
         statusCode: 200,
