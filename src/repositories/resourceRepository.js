@@ -13,16 +13,12 @@ const getUserResources = userId => new Promise((resolve, reject) => {
   docClient.scan(params, (err, data) => {
     if (err) {
       // eslint-disable-next-line no-console
-      console.log(err);
+      console.error(err);
 
       return reject(err);
     }
 
-    // if (!data.Item) {
-    //   return resolve(null);
-    // }
-
-    return resolve(data);
+    return resolve(data.Items.map(r => new Resource(r)));
   });
 });
 
@@ -84,7 +80,7 @@ const deleteResource = (id) => {
     docClient.delete(params, (err) => {
       if (err) {
         // eslint-disable-next-line no-console
-        console.log(err);
+        console.error(err);
 
         reject(err);
       } else {
