@@ -4,11 +4,11 @@ const parseBody = (body) => {
   try {
     data = JSON.parse(body);
 
-    if (data === null || typeof data !== 'object') {
+    if (data === null) {
       return {
         success: false,
         result: {
-          error: 'Body should be an object',
+          error: 'Body should be a not null object',
         },
       };
     }
