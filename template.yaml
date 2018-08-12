@@ -43,24 +43,6 @@ Resources:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
 
-  GetResourceFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: build
-      Handler: index.getResource
-      Runtime: nodejs8.10
-      Policies: AmazonDynamoDBReadOnlyAccess
-      Environment:
-        Variables:
-          TABLE_RESOURCE: 'aws-lambda-dynamo-table-resource'
-          TABLE_USER: 'aws-lambda-dynamo-table-user'
-      Events:
-        GetResource:
-          Type: Api
-          Properties:
-            Path: /resource/{userId}/{resourceId}
-            Method: get
-
   ListResourceFunction:
     Type: AWS::Serverless::Function
     Properties:

@@ -1,4 +1,3 @@
-export { default as getResource } from './api/resources/get';
 export { default as listResource } from './api/resources/list';
 export { default as postResource } from './api/resources/post';
 export { default as deleteResource } from './api/resources/delete';

@@ -1,4 +1,3 @@
-import getResource from '../../src/api/resources/get';
 import listResource from '../../src/api/resources/list';
 import postResource from '../../src/api/resources/post';
 import deleteResource from '../../src/api/resources/delete';
@@ -8,10 +7,6 @@ import postUser from '../../src/api/users/post';
 import patchUser from '../../src/api/users/patch';
 import deleteUser from '../../src/api/users/delete';
 import * as index from '../../src/index';
-
-test('Should exports "getResource"', () => {
-  expect(index.getResource).toBe(getResource);
-});
 
 test('Should exports "listResource"', () => {
   expect(index.listResource).toBe(listResource);

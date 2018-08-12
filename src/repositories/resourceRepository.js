@@ -26,35 +26,6 @@ const getUserResources = userId => new Promise((resolve, reject) => {
   });
 });
 
-const getResourceById = id => new Promise((resolve, reject) => {
-  const resourceName = Resource.getNameFromId(id);
-
-  if (resourceName === null) {
-    resolve(null);
-    return;
-  }
-
-  const params = {
-    TableName: getResourceTableName(),
-    Key: { resourceName },
-  };
-
-  docClient.get(params, (err, data) => {
-    if (err) {
-      // eslint-disable-next-line no-console
-      console.log(err);
-
-      return reject(err);
-    }
-
-    if (!data.Item) {
-      return resolve(null);
-    }
-
-    return resolve(new Resource(data.Item));
-  });
-});
-
 const saveResource = (resource, isNew) => {
   const { valid, error } = resource.validate();
 
@@ -99,6 +70,5 @@ const saveResource = (resource, isNew) => {
 
 export {
   getUserResources,
-  getResourceById,
   saveResource,
 };
