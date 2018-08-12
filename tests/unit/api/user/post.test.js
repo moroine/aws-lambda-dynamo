@@ -1,4 +1,3 @@
-import mockConsole from 'jest-mock-console';
 import postUser from '../../../../src/api/users/post';
 import User from '../../../../src/model/User';
 import parseBody from '../../../../src/api/helpers/parseBody';

@@ -1,7 +1,5 @@
-import { docClient, getUserTableName } from '../../db';
 import parseBody from '../helpers/parseBody';
-import User from '../../model/User';
-import getUserById, { saveUser } from '../../repositories/userRepository';
+import { getUserById, saveUser } from '../../repositories/userRepository';
 
 const patchUser = (event, context, callback) => {
   const { success, result } = parseBody(event.body);
@@ -11,7 +9,7 @@ const patchUser = (event, context, callback) => {
       null,
       {
         statusCode: 400,
-        body: JSON.stringify(result),
+        body: JSON.stringify({ error: result }),
       },
     );
 
@@ -40,14 +38,6 @@ const patchUser = (event, context, callback) => {
           } else {
             callback(null, { statusCode: 400, body: JSON.stringify({ error: resultSave }) });
           }
-        })
-        .catch(() => {
-          callback(null, {
-            statusCode: 500,
-            body: JSON.stringify({
-              error: 'Internal Server Error',
-            }),
-          });
         });
     })
     .catch(() => {
