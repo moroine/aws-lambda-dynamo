@@ -10,7 +10,7 @@ const postResource = (event, context, callback) => {
       null,
       {
         statusCode: 400,
-        body: JSON.stringify(result),
+        body: JSON.stringify({ error: result }),
       },
     );
 

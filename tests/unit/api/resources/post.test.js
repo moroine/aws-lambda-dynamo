@@ -1,32 +1,92 @@
 import mockConsole from 'jest-mock-console';
 import postResource from '../../../../src/api/resources/post';
+import parseBody from '../../../../src/api/helpers/parseBody';
+import Resource from '../../../../src/model/Resource';
+import { saveResource } from '../../../../src/repositories/resourceRepository';
+
 import { docClient, getResourceTableName } from '../../../../src/db';
 
-jest.mock('../../../../src/db');
+jest.mock('../../../../src/api/helpers/parseBody');
+jest.mock('../../../../src/model/Resource');
+jest.mock('../../../../src/repositories/resourceRepository');
 
-test('Should create a new resource', (done) => {
-  const resourceId = 'abc-123';
+beforeEach(() => {
+  // Clear all instances and calls to constructor and all methods:
+  parseBody.mockClear();
+  saveResource.mockClear();
+  Resource.mockClear();
+});
 
+test('Should return client error if invalid given body', (done) => {
   const event = {
-    body: JSON.stringify({ resourceId }),
+    body: Symbol('event body'),
+    pathParameters: {
+      userId: 'my-user-id',
+    },
   };
 
-  const TableName = 'a-custom-table-name';
-  getResourceTableName.mockReturnValue(TableName);
+  parseBody.mockImplementation((body) => {
+    expect(body).toBe(event.body);
 
-  docClient.put.mockImplementation((params, cb) => {
-    expect(params).toEqual({
-      TableName,
-      Item: {
-        id: resourceId,
-      },
-      ConditionExpression: 'attribute_not_exists(id)',
-    });
-
-    cb();
+    return {
+      success: false,
+      result: 'Error from parse',
+    };
   });
 
   const responseCb = (err, resp) => {
+    expect(err).toBe(null);
+    expect(resp).toEqual({
+      statusCode: 400,
+      body: JSON.stringify({
+        error: 'Error from parse',
+      }),
+    });
+
+    done();
+  };
+
+  postResource(event, null, responseCb);
+});
+
+test('Should create a new Resource', (done) => {
+  const data = {
+    name: 'this is a resource',
+  };
+
+  const event = {
+    body: JSON.stringify(data),
+    pathParameters: {
+      userId: 'my-user-id',
+    },
+  };
+
+  parseBody.mockImplementation((body) => {
+    expect(body).toBe(event.body);
+
+    return {
+      success: true,
+      result: data,
+    };
+  });
+
+  saveResource.mockResolvedValue({
+    success: true,
+    result: null,
+  });
+
+  const responseCb = (err, resp) => {
+    expect(saveResource).toHaveBeenCalledTimes(1);
+    expect(Resource).toHaveBeenCalledTimes(1);
+    expect(Resource.mock.calls[0]).toEqual([{ name: 'this is a resource', userId: 'my-user-id' }]);
+
+    expect(saveResource.mock.calls).toHaveLength(1);
+    expect(saveResource.mock.calls[0]).toHaveLength(2);
+
+    const [user, isNew] = (saveResource.mock.calls[0]);
+    expect(user).toBe(Resource.mock.instances[0]);
+    expect(isNew).toBe(true);
+
     expect(err).toBe(null);
     expect(resp).toEqual({ statusCode: 204, body: null });
 
@@ -36,98 +96,46 @@ test('Should create a new resource', (done) => {
   postResource(event, null, responseCb);
 });
 
-test('Should return client error id body is not a valid JSON', (done) => {
-  const event = {
-    body: 'I am totally not a JSON',
+test('Should return client error if saveResource is not success', (done) => {
+  const data = {
+    name: 'this is a resource',
   };
-
-  const responseCb = (err, resp) => {
-    expect(err).toBe(null);
-    expect(resp).toEqual({
-      statusCode: 400,
-      body: JSON.stringify({
-        error: 'POST body is not a valid JSON object',
-      }),
-    });
-
-    done();
-  };
-
-  postResource(event, null, responseCb);
-});
-
-test('Should return client error id body is null', (done) => {
-  const event = {
-    body: null,
-  };
-
-  const responseCb = (err, resp) => {
-    expect(err).toBe(null);
-    expect(resp).toEqual({
-      statusCode: 400,
-      body: JSON.stringify({
-        error: 'POST body is not a valid JSON object',
-      }),
-    });
-
-    done();
-  };
-
-  postResource(event, null, responseCb);
-});
-
-test('Should return client error if missing resourceId', (done) => {
-  const event = {
-    body: '{}',
-  };
-
-  const responseCb = (err, resp) => {
-    expect(err).toBe(null);
-    expect(resp).toEqual({
-      statusCode: 400,
-      body: JSON.stringify({
-        error: 'Missing key resourceId',
-      }),
-    });
-
-    done();
-  };
-
-  postResource(event, null, responseCb);
-});
-
-test('Should not create if already exists', (done) => {
-  const resourceId = 'abc-123';
 
   const event = {
-    body: JSON.stringify({ resourceId }),
+    body: JSON.stringify(data),
+    pathParameters: {
+      userId: 'my-user-id',
+    },
   };
 
-  const TableName = 'a-custom-table-name';
-  getResourceTableName.mockReturnValue(TableName);
+  parseBody.mockImplementation((body) => {
+    expect(body).toBe(event.body);
 
-  docClient.put.mockImplementation((params, cb) => {
-    expect(params).toEqual({
-      TableName,
-      Item: {
-        id: resourceId,
-      },
-      ConditionExpression: 'attribute_not_exists(id)',
-    });
+    return {
+      success: true,
+      result: data,
+    };
+  });
 
-    cb({
-      name: 'ConditionalCheckFailedException',
-    });
+  saveResource.mockResolvedValue({
+    success: false,
+    result: 'Invalid data',
   });
 
   const responseCb = (err, resp) => {
+    expect(saveResource).toHaveBeenCalledTimes(1);
+    expect(Resource).toHaveBeenCalledTimes(1);
+    expect(Resource.mock.calls[0]).toEqual([{ name: 'this is a resource', userId: 'my-user-id' }]);
+
+    expect(saveResource.mock.calls).toHaveLength(1);
+    expect(saveResource.mock.calls[0]).toHaveLength(2);
+
+    const [resource, isNew] = (saveResource.mock.calls[0]);
+    expect(resource).toBe(Resource.mock.instances[0]);
+    expect(isNew).toBe(true);
+
     expect(err).toBe(null);
-    expect(resp).toEqual({
-      statusCode: 400,
-      body: JSON.stringify({
-        error: 'Given resource already exists',
-      }),
-    });
+    expect(resp).toEqual({ statusCode: 400, body: JSON.stringify({ error: 'Invalid data' }) });
 
     done();
   };
@@ -135,43 +143,43 @@ test('Should not create if already exists', (done) => {
   postResource(event, null, responseCb);
 });
 
-test('Should return Internal Server Error if unexpected error happen', (done) => {
-  const resourceId = 'abc-123';
-
-  const event = {
-    body: JSON.stringify({ resourceId }),
+test('Should return server error on unexpected error', (done) => {
+  const data = {
+    name: 'this is a resource',
   };
 
-  const TableName = 'a-custom-table-name';
-  getResourceTableName.mockReturnValue(TableName);
+  const event = {
+    body: JSON.stringify(data),
+    pathParameters: {
+      userId: 'my-user-id',
+    },
+  };
 
-  const restoreConsole = mockConsole();
-  const error = new Error('Unexpected');
+  parseBody.mockImplementation((body) => {
+    expect(body).toBe(event.body);
 
-  docClient.put.mockImplementation((params, cb) => {
-    expect(params).toEqual({
-      TableName,
-      Item: {
-        id: resourceId,
-      },
-      ConditionExpression: 'attribute_not_exists(id)',
-    });
-
-    cb(error);
+    return {
+      success: true,
+      result: data,
+    };
   });
 
-  const responseCb = (err, resp) => {
-    expect(err).toBe(null);
-    expect(resp).toEqual({
-      statusCode: 500,
-      body: JSON.stringify({
-        error: 'Internal Server Error',
-      }),
-    });
+  saveResource.mockRejectedValue(new Error('Unexpected error'));
 
-    // eslint-disable-next-line no-console
-    expect(console.error).toHaveBeenCalledWith(error);
-    restoreConsole();
+  const responseCb = (err, resp) => {
+    expect(saveResource).toHaveBeenCalledTimes(1);
+    expect(Resource).toHaveBeenCalledTimes(1);
+    expect(Resource.mock.calls[0]).toEqual([{ name: 'this is a resource', userId: 'my-user-id' }]);
+
+    expect(saveResource.mock.calls).toHaveLength(1);
+    expect(saveResource.mock.calls[0]).toHaveLength(2);
+
+    const [user, isNew] = (saveResource.mock.calls[0]);
+    expect(user).toBe(Resource.mock.instances[0]);
+    expect(isNew).toBe(true);
+
+    expect(err).toBe(null);
+    expect(resp).toEqual({ statusCode: 500, body: JSON.stringify({ error: 'Internal Server Error' }) });
 
     done();
   };
