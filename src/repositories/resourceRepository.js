@@ -68,7 +68,34 @@ const saveResource = (resource, isNew) => {
   });
 };
 
+const deleteResource = (id) => {
+  const resourceName = Resource.getNameFromId(id);
+
+  if (resourceName === null) {
+    return Promise.resolve();
+  }
+
+  return new Promise((resolve, reject) => {
+    const params = {
+      TableName: getResourceTableName(),
+      Key: { resourceName },
+    };
+
+    docClient.delete(params, (err) => {
+      if (err) {
+        // eslint-disable-next-line no-console
+        console.log(err);
+
+        reject(err);
+      } else {
+        resolve();
+      }
+    });
+  });
+};
+
 export {
   getUserResources,
   saveResource,
+    deleteResource,
 };
