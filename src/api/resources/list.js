@@ -7,7 +7,7 @@ const listResource = (event, context, callback) => {
     .then((resources) => {
       callback(null, {
         statusCode: 200,
-        body: JSON.stringify(resources),
+        body: JSON.stringify(resources.map(r => r.serialize())),
       });
     })
     .catch(() => {
