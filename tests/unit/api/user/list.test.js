@@ -1,14 +1,11 @@
 import listUser from '../../../../src/api/users/list';
-import User from '../../../../src/model/User';
 import { getAllUsers } from '../../../../src/repositories/userRepository';
 
-jest.mock('../../../../src/model/User');
 jest.mock('../../../../src/repositories/userRepository');
 
 beforeEach(() => {
   // Clear all instances and calls to constructor and all methods:
   getAllUsers.mockClear();
-  User.mockClear();
 });
 
 test('Should return all users', (done) => {
