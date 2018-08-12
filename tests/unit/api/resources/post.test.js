@@ -1,10 +1,7 @@
-import mockConsole from 'jest-mock-console';
 import postResource from '../../../../src/api/resources/post';
 import parseBody from '../../../../src/api/helpers/parseBody';
 import Resource from '../../../../src/model/Resource';
 import { saveResource } from '../../../../src/repositories/resourceRepository';
-
-import { docClient, getResourceTableName } from '../../../../src/db';
 
 jest.mock('../../../../src/api/helpers/parseBody');
 jest.mock('../../../../src/model/Resource');

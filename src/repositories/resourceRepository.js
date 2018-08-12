@@ -97,5 +97,5 @@ const deleteResource = (id) => {
 export {
   getUserResources,
   saveResource,
-    deleteResource,
+  deleteResource,
 };
