@@ -13,6 +13,14 @@ class Resource {
     }
   }
 
+  static getIdFromName(name) {
+    try {
+      return querystring.escape(base64.encode(name));
+    } catch (e) {
+      return null;
+    }
+  }
+
   constructor(data = {}) {
     this.resourceName = null;
 
@@ -22,21 +30,15 @@ class Resource {
   }
 
   update(data) {
-    this.resourceName = data.resourceName || this.resourceName;
-
-    if (typeof this.resourceName === 'string') {
-      this.resourceName = validator.trim(this.resourceName);
+    if (typeof data.resourceName === 'string') {
+      this.resourceName = validator.trim(data.resourceName);
     }
 
     this.userId = data.userId || this.userId;
   }
 
   getId() {
-    try {
-      return querystring.escape(base64.encode(this.resourceName));
-    } catch (e) {
-      return null;
-    }
+    return this.constructor.getIdFromName(this.resourceName);
   }
 
   validate() {
