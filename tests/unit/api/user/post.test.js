@@ -1,6 +1,6 @@
 import postUser from '../../../../src/api/users/post';
-import User from '../../../../src/model/User';
 import parseBody from '../../../../src/api/helpers/parseBody';
+import User from '../../../../src/model/User';
 import { saveUser } from '../../../../src/repositories/userRepository';
 
 jest.mock('../../../../src/api/helpers/parseBody');
@@ -70,6 +70,10 @@ test('Should create a new User', (done) => {
   const responseCb = (err, resp) => {
     expect(saveUser).toHaveBeenCalledTimes(1);
     expect(User).toHaveBeenCalledTimes(1);
+    expect(User.mock.calls[0]).toEqual([{
+      email: 'moroine.bentefrit@mail.com',
+      password: 'my-password',
+    }]);
 
     expect(saveUser.mock.calls).toHaveLength(1);
     expect(saveUser.mock.calls[0]).toHaveLength(2);
@@ -155,6 +159,10 @@ test('Should return server error on unexpected error', (done) => {
   const responseCb = (err, resp) => {
     expect(saveUser).toHaveBeenCalledTimes(1);
     expect(User).toHaveBeenCalledTimes(1);
+    expect(User.mock.calls[0]).toEqual([{
+      email: 'moroine.bentefrit@mail.com',
+      password: 'my-password',
+    }]);
 
     expect(saveUser.mock.calls).toHaveLength(1);
     expect(saveUser.mock.calls[0]).toHaveLength(2);
