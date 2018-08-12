@@ -10,7 +10,7 @@ const postUser = (event, context, callback) => {
       null,
       {
         statusCode: 400,
-        body: JSON.stringify(result),
+        body: JSON.stringify({ error: result }),
       },
     );
 
@@ -24,7 +24,7 @@ const postUser = (event, context, callback) => {
       if (successSave) {
         callback(null, { statusCode: 204, body: null });
       } else {
-        callback(null, { statusCode: 400, body: JSON.stringify({ error: resultSave }), });
+        callback(null, { statusCode: 400, body: JSON.stringify({ error: resultSave }) });
       }
     })
     .catch(() => {
