@@ -91,8 +91,35 @@ const saveUser = (user, isNew) => {
   });
 };
 
+const deleteUser = (id) => {
+  const email = User.getEmailFromId(id);
+
+  if (email === null) {
+    return Promise.resolve();
+  }
+
+  return new Promise((resolve, reject) => {
+    const params = {
+      TableName: getUserTableName(),
+      Key: { email },
+    };
+
+    docClient.delete(params, (err) => {
+      if (err) {
+        // eslint-disable-next-line no-console
+        console.log(err);
+
+        reject(err);
+      } else {
+        resolve();
+      }
+    });
+  });
+};
+
 export {
   getAllUsers,
   getUserById,
   saveUser,
+  deleteUser,
 };
