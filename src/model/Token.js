@@ -10,7 +10,17 @@ class Token {
   }
 
   update(data) {
+    if (data.token) {
+      this.token = data.token;
+    }
 
+    if (data.userId) {
+      this.userId = data.userId;
+    }
+
+    if (data.ttl) {
+      this.ttl = data.ttl;
+    }
   }
 
   save() {
