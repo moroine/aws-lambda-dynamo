@@ -1,3 +1,4 @@
+import bcrypt from 'bcryptjs';
 import User from '../../../src/model/User';
 
 describe('User.getIdFromEmail()', () => {
@@ -301,5 +302,28 @@ describe('.validate()', () => {
       valid: true,
       error: null,
     });
+  });
+});
+
+describe('.getEncodedPassword', () => {
+  test('Should return the current encoded password if password is not updated', () => {
+    const user = new User({ encodedPassword: 'hash-pass' });
+
+    expect(user.getEncodedPassword()).toBe('hash-pass');
+  });
+
+  test('Should return null if neither password nor encoded one', () => {
+    const user = new User({ });
+
+    expect(user.getEncodedPassword()).toBe(null);
+  });
+
+  test('Should get the encoded password from given plain one and clear plain password', () => {
+    const user = new User({ password: 'pass' });
+
+    const hash = user.getEncodedPassword();
+    expect(user.password).toBe(null);
+    expect(bcrypt.compareSync('pass', hash)).toBe(true);
+    expect(bcrypt.compareSync('invalid-pass', hash)).toBe(false);
   });
 });
