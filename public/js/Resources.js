@@ -1,0 +1,9 @@
+class Resources {
+  constructor() {
+
+  }
+
+  update() {
+
+  }
+}
