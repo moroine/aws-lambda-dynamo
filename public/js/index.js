@@ -1,5 +1,9 @@
 $(document).ready(() => {
-  const app = new App();
+  window.app = new App();
+  window.resources = new Resources();
+  window.admin = new Admin();
 
-  app.start();
+    window.app.start();
+    window.resources.start();
+    window.admin.start();
 });

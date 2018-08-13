@@ -9,13 +9,100 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
           integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css"/>
+
+    <style>
+        #loading {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #aaa;
+            overflow: hidden;
+            z-index: 100000;
+        }
+
+        #spinner {
+            border-radius: 100%;
+            background: #262626;
+            width: 100px;
+            height: 100px;
+            margin: 100px auto 0 auto;
+            position: relative;
+            animation: turning .5s cubic-bezier(.46, .01, 1, .67) infinite alternate;
+            box-shadow: 15px 15px 0px rgba(0, 0, 0, .2);
+            box-sizing: border-box;
+            padding: 35px;
+        }
+
+        #scr {
+            width: 30px;
+            height: 30px;
+            background: white;
+            animation: round 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes turning {
+            from {
+                top: 0;
+            }
+
+            to {
+                top: 300px;
+            }
+        }
+
+        @keyframes left-to-right {
+            0% {
+                transform: rotate(30deg);
+            }
+
+            50% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(-30deg);
+            }
+        }
+
+        @keyframes round {
+            0% {
+                border-radius: 0 0 0 0;
+                transform: rotate(0deg);
+            }
+
+            25% {
+                border-radius: 50% 0 0 0;
+                transform: rotate(90deg);
+            }
+
+            50% {
+                border-radius: 50% 50% 0 0;
+                transform: rotate(180deg);
+            }
+
+            75% {
+                border-radius: 50% 50% 50% 0;
+                transform: rotate(270deg);
+            }
+
+            100% {
+                border-radius: 50% 50% 50% 50%;
+                transform: rotate(360deg);
+            }
+        }
+    </style>
     <title>Platform</title>
 </head>
 <body>
 
-<!--<div class="loading invisible">-->
-    <!---->
-<!--</div>-->
+<div class="d-none" id="loading">
+    <div id="spinner">
+        <div id="scr"></div>
+    </div>
+</div>
 
 <div id="login" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -25,22 +112,24 @@
             </div>
             <div class="modal-body">
                 <form id="login-form">
-                <div class="form-group">
-                    <label for="login-email">Email address</label>
-                    <input type="email" class="form-control" id="login-email" name="email" placeholder="Enter email" required>
-                </div>
-                <div class="form-group">
-                    <label for="login-password">Password</label>
-                    <input type="password" class="form-control" id="login-password" name="password" placeholder="Password" required>
-                </div>
-                <button type="submit" class="btn btn-primary">Submit</button>
-            </form>
+                    <div class="form-group">
+                        <label for="login-email">Email address</label>
+                        <input type="email" class="form-control" id="login-email" name="email" placeholder="Enter email"
+                               required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Password</label>
+                        <input type="password" class="form-control" id="login-password" name="password"
+                               placeholder="Password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
             </div>
         </div>
     </div>
 </div>
 
-<div class="invisible" id="app">
+<div class="d-none" id="app">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <a class="navbar-brand" href="#">Platform</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav"
@@ -57,6 +146,10 @@
                     <a class="nav-link" id="nav-admin" href="#">Admin</a>
                 </li>
             </ul>
+            <form class="form-inline">
+                <button class="btn btn-success" type="button" id="create-resource-btn">New Resource</button>
+                <button class="btn btn-success" type="button" id="create-user-btn">New User</button>
+            </form>
         </div>
     </nav>
 
@@ -67,44 +160,170 @@
                     <thead>
                     <tr>
                         <th scope="col">#</th>
-                        <th scope="col">First</th>
-                        <th scope="col">Last</th>
-                        <th scope="col">Handle</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Action</th>
                     </tr>
                     </thead>
-                    <tbody>
-                    <tr>
-                        <th scope="row">1</th>
-                        <td>Mark</td>
-                        <td>Otto</td>
-                        <td>@mdo</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">2</th>
-                        <td>Jacob</td>
-                        <td>Thornton</td>
-                        <td>@fat</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">3</th>
-                        <td>Larry</td>
-                        <td>the Bird</td>
-                        <td>@twitter</td>
-                    </tr>
+                    <tbody id="self-resources-table">
                     </tbody>
                 </table>
             </div>
         </div>
-        <div class="col-md-12 invisible" id="user-page">
-
+        <div id="admin-page">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Quota</th>
+                        <th scope="col">isAdmin</th>
+                    </tr>
+                    </thead>
+                    <tbody id="user-table">
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
 
+<div id="create-resource" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create Resource</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="resource-form">
+                    <div class="form-group">
+                        <label for="resource-name">Name</label>
+                        <input type="text" class="form-control" id="resource-name" name="resourceName"
+                               placeholder="Enter resource name" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="resource-list-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Resources</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                        </thead>
+                        <tbody id="modal-resources-table">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="create-user" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create User</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="create-user-form">
+                    <div class="form-group">
+                        <label for="user-email">Email</label>
+                        <input type="email" class="form-control" id="user-email" name="email"
+                               placeholder="Enter email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="user-quota">Quota</label>
+                        <input type="number" min="-1" class="form-control" id="user-quota" name="quota"
+                               placeholder="Enter quota" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="user-password">Password</label>
+                        <input type="password" min="-1" class="form-control" id="user-password" name="password"
+                               placeholder="Enter password" required>
+                    </div>
+                    <div class="form-group">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="isAdmin" value="true"
+                                   id="user-isAdmin">
+                            <label class="form-check-label" for="user-isAdmin">
+                                Is Admin
+                            </label>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="edit-user" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit User</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-user-form">
+                    <div class="form-group">
+                        <label for="edit-user-quota">Quota</label>
+                        <input type="number" min="-1" class="form-control" id="edit-user-quota" name="quota"
+                               placeholder="Enter quota" required>
+                    </div>
+                    <div class="form-group">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="isAdmin" value="true"
+                                   id="edit-user-isAdmin">
+                            <label class="form-check-label" for="edit-user-isAdmin">
+                                Is Admin
+                            </label>
+                        </div>
+                    </div>
+                    <input type="hidden" name="userId" id="edit-user-id">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 <!-- Optional JavaScript -->
 <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
         crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
         integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
@@ -112,8 +331,12 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
         integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
         crossorigin="anonymous"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
 <script src="js/index.js"></script>
+<script src="js/Client.js"></script>
 <script src="js/App.js"></script>
+<script src="js/Resources.js"></script>
+<script src="js/Admin.js"></script>
 </body>
 </html>
