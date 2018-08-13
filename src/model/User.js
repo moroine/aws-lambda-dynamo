@@ -14,6 +14,14 @@ class User {
     }
   }
 
+  static getIdFromEmail(email) {
+    try {
+      return querystring.escape(base64.encode(email));
+    } catch (e) {
+      return null;
+    }
+  }
+
   constructor(data = {}) {
     this.email = null;
 
@@ -29,7 +37,11 @@ class User {
   }
 
   update(data) {
-    this.email = data.email || this.email;
+    if (typeof data.email === 'string') {
+      this.email = validator.normalizeEmail(
+        validator.trim(data.email),
+      );
+    }
 
     this.quota = data.quota || this.quota;
 
@@ -45,27 +57,23 @@ class User {
   getEncodedPassword() {
     if (this.password) {
       this.encodedPassword = bcryptjs.hashSync(this.password, 5);
+      this.password = null;
     }
 
     return this.encodedPassword;
   }
 
   getId() {
-    try {
-      return querystring.escape(base64.encode(this.email));
-    } catch (e) {
-      return null;
-    }
+    return this.constructor.getIdFromEmail(this.email);
   }
 
   validate() {
-    if (!validator.isEmail(this.email)) {
+    if (typeof this.email !== 'string' || !validator.isEmail(this.email)) {
       return {
         valid: false,
         error: 'User.email must be specified',
       };
     }
-    this.email = validator.normalizeEmail(this.email);
 
     if (!this.getEncodedPassword()) {
       return {
@@ -80,7 +88,6 @@ class User {
         error: 'User.quota must be an integer',
       };
     }
-    this.quota = Math.max(this.quota, -1);
 
     return {
       valid: true,

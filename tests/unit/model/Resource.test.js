@@ -131,6 +131,7 @@ describe('.getId()', () => {
     expect(calls[0][0]).toBe('resource-name');
   });
 });
+
 describe('.save()', () => {
   test('Should delegate to serialize', () => {
     const calls = [];
@@ -138,7 +139,7 @@ describe('.save()', () => {
     const result = {};
 
     class MockResource extends Resource {
-    // eslint-disable-next-line class-methods-use-this
+      // eslint-disable-next-line class-methods-use-this
       serialize(...args) {
         calls.push(args);
 
