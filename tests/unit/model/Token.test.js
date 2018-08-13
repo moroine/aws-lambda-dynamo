@@ -1,4 +1,3 @@
-import bcrypt from 'bcryptjs';
 import Token from '../../../src/model/Token';
 
 describe('new Token()', () => {
