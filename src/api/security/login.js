@@ -16,7 +16,21 @@ const login = (event, context, callback) => {
     return;
   }
 
+  crypto.randomBytes(48, (err, buffer) => {
+    if (err) {
+        console.error(err);
+      callback(
+        null,
+        {
+          statusCode: 500, body: JSON.stringify({ error: 'Internal Server Error' }),
+        },
+      );
 
+      return;
+    }
+
+    const t = buffer.toString('hex');
+  });
 };
 
 export default login;
