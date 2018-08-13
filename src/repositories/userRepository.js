@@ -92,6 +92,8 @@ const saveUser = (user, isNew) => {
 };
 
 const deleteUser = (id) => {
+  // TODO: Remove resources
+  // TODO: Remove tokens
   const email = User.getEmailFromId(id);
 
   if (email === null) {

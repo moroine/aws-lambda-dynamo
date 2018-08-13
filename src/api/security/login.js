@@ -6,6 +6,8 @@ import { saveToken } from '../../repositories/tokenRepository';
 import Token from '../../model/Token';
 
 const login = (event, context, callback) => {
+    // TODO: test me
+
   const { success, result } = parseBody(event.body);
 
   if (!success) {
@@ -88,8 +90,8 @@ const login = (event, context, callback) => {
             {
               statusCode: 200,
               body: JSON.stringify({
-                  user: user.serialize(),
-                  token: token.serialize(),
+                user: user.serialize(),
+                token: token.serialize(),
               }),
             },
           );

@@ -23,6 +23,7 @@ const getUserResources = userId => new Promise((resolve, reject) => {
 });
 
 const saveResource = (resource, isNew) => {
+  // TODO: Check quota
   const { valid, error } = resource.validate();
 
   if (!valid) {

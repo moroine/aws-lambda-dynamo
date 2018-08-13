@@ -2,6 +2,7 @@ import { getUserById } from '../../repositories/userRepository';
 import { getToken } from '../../repositories/tokenRepository';
 
 const authenticate = (event, context, callback) => {
+    // TODO: test me
   const token = event.yo;
   const userId = event.usi;
 
