@@ -5,37 +5,190 @@ Description: >
 
   Sample SAM Template for aws-lambda-dynamo
 
-# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
     Timeout: 3
 
-
 Resources:
 
-  HelloWorldFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+  DynamoDBTableResource:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: 'aws-lambda-dynamo-table-resource'
+      AttributeDefinitions:
+      - AttributeName: userId
+        AttributeType: S
+      - AttributeName: resourceName
+        AttributeType: S
+      KeySchema:
+      - AttributeName: userId
+        KeyType: RANGE
+      - AttributeName: resourceId
+        KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+
+  DynamoDBTableUser:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: 'aws-lambda-dynamo-table-user'
+      AttributeDefinitions:
+      - AttributeName: email
+        AttributeType: S
+      KeySchema:
+      - AttributeName: email
+        KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+
+  ListResourceFunction:
+    Type: AWS::Serverless::Function
     Properties:
       CodeUri: build
-      Handler: index.helloWorld
+      Handler: index.listResource
       Runtime: nodejs8.10
+      Policies: AmazonDynamoDBReadOnlyAccess
+      Environment:
+        Variables:
+          TABLE_RESOURCE: 'aws-lambda-dynamo-table-resource'
+          TABLE_USER: 'aws-lambda-dynamo-table-user'
       Events:
-        HelloWorld:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+        ListResource:
+          Type: Api
           Properties:
-            Path: /hello
+            Path: /resource/{userId}
             Method: get
+
+  PostResourceFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: build
+      Handler: index.postResource
+      Runtime: nodejs8.10
+      Policies: AmazonDynamoDBFullAccess
+      Environment:
+        Variables:
+          TABLE_RESOURCE: 'aws-lambda-dynamo-table-resource'
+          TABLE_USER: 'aws-lambda-dynamo-table-user'
+      Events:
+        PostResource:
+          Type: Api
+          Properties:
+            Path: /resource/{userId}
+            Method: post
+
+  DeleteResourceFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: build
+      Handler: index.deleteResource
+      Runtime: nodejs8.10
+      Policies: AmazonDynamoDBFullAccess
+      Environment:
+        Variables:
+          TABLE_RESOURCE: 'aws-lambda-dynamo-table-resource'
+          TABLE_USER: 'aws-lambda-dynamo-table-user'
+      Events:
+        DeleteResource:
+          Type: Api
+          Properties:
+            Path: /resource/{userId}/{resourceId}
+            Method: delete
+
+  GetUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: build
+      Handler: index.getUser
+      Runtime: nodejs8.10
+      Policies: AmazonDynamoDBFullAccess
+      Environment:
+        Variables:
+          TABLE_RESOURCE: 'aws-lambda-dynamo-table-resource'
+          TABLE_USER: 'aws-lambda-dynamo-table-user'
+      Events:
+        GetUer:
+          Type: Api
+          Properties:
+            Path: /user/{id}
+            Method: get
+
+  ListUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: build
+      Handler: index.listUser
+      Runtime: nodejs8.10
+      Policies: AmazonDynamoDBFullAccess
+      Environment:
+        Variables:
+          TABLE_RESOURCE: 'aws-lambda-dynamo-table-resource'
+          TABLE_USER: 'aws-lambda-dynamo-table-user'
+      Events:
+        ListUser:
+          Type: Api
+          Properties:
+            Path: /user
+            Method: get
+
+  PostUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: build
+      Handler: index.postUser
+      Runtime: nodejs8.10
+      Policies: AmazonDynamoDBFullAccess
+      Environment:
+        Variables:
+          TABLE_RESOURCE: 'aws-lambda-dynamo-table-resource'
+          TABLE_USER: 'aws-lambda-dynamo-table-user'
+      Events:
+        PostUser:
+          Type: Api
+          Properties:
+            Path: /user
+            Method: post
+
+  PatchUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: build
+      Handler: index.patchUser
+      Runtime: nodejs8.10
+      Policies: AmazonDynamoDBFullAccess
+      Environment:
+        Variables:
+          TABLE_RESOURCE: 'aws-lambda-dynamo-table-resource'
+          TABLE_USER: 'aws-lambda-dynamo-table-user'
+      Events:
+        PutUser:
+          Type: Api
+          Properties:
+            Path: /user/{id}
+            Method: patch
+
+  DeleteUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: build
+      Handler: index.deleteUser
+      Runtime: nodejs8.10
+      Policies: AmazonDynamoDBFullAccess
+      Environment:
+        Variables:
+          TABLE_RESOURCE: 'aws-lambda-dynamo-table-resource'
+          TABLE_USER: 'aws-lambda-dynamo-table-user'
+      Events:
+        DeleteUser:
+          Type: Api
+          Properties:
+            Path: /user/{id}
+            Method: delete
 
 Outputs:
 
-  HelloWorldApi:
-    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
-
-  HelloWorldFunction:
-    Description: "Hello World Lambda Function ARN"
-    Value: !GetAtt HelloWorldFunction.Arn
-
-  HelloWorldFunctionIamRole:
-    Description: "Implicit IAM Role created for Hello World function"
-    Value: !GetAtt HelloWorldFunctionRole.Arn
+  Api:
+    Description: "API Gateway endpoint URL"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/"
