@@ -23,7 +23,7 @@ describe('DELETE /resource/{userId}/{resourceId}', () => {
       },
     };
 
-    authenticate.mockResolvedValue({ userId: 'uid', isAdmin: true });
+    authenticate.mockResolvedValue({ getId: () => 'uid', isAdmin: true });
 
     deleteResourceFromDb.mockResolvedValue();
 
@@ -35,6 +35,11 @@ describe('DELETE /resource/{userId}/{resourceId}', () => {
       expect(resp).toEqual({
         statusCode: 204,
         body: null,
+        headers: {
+          'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,PATCH',
+          'Access-Control-Allow-Headers': 'Content-Type,Authorization,X-User-Id',
+          'Access-Control-Allow-Origin': '*',
+        },
       });
 
       done();
@@ -51,7 +56,7 @@ describe('DELETE /resource/{userId}/{resourceId}', () => {
       },
     };
 
-    authenticate.mockResolvedValue({ userId: 'uid', isAdmin: true });
+    authenticate.mockResolvedValue({ getId: () => 'uid', isAdmin: true });
 
     deleteResourceFromDb.mockRejectedValue(new Error('Unexpected'));
 
@@ -63,6 +68,11 @@ describe('DELETE /resource/{userId}/{resourceId}', () => {
       expect(resp).toEqual({
         statusCode: 500,
         body: JSON.stringify({ error: 'Internal Server Error' }),
+        headers: {
+          'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,PATCH',
+          'Access-Control-Allow-Headers': 'Content-Type,Authorization,X-User-Id',
+          'Access-Control-Allow-Origin': '*',
+        },
       });
 
       done();
@@ -76,7 +86,7 @@ describe('DELETE /resource/{userId}/{resourceId}', () => {
       pathParameters: { userId: 'uid' },
     };
 
-    authenticate.mockResolvedValue({ userId: 'otherUid' });
+    authenticate.mockResolvedValue({ getId: () => 'otherUid' });
     forbidden.mockImplementation((cb) => { cb(); });
 
     const responseCb = () => {
@@ -96,7 +106,7 @@ describe('DELETE /resource/{userId}/{resourceId}', () => {
       pathParameters: { userId: 'uid' },
     };
 
-    authenticate.mockResolvedValue({ userId: 'uid' });
+    authenticate.mockResolvedValue({ getId: () => 'uid' });
     forbidden.mockImplementation((cb) => { cb(); });
 
     const responseCb = () => {
@@ -114,7 +124,7 @@ describe('DELETE /resource/{userId}/{resourceId}', () => {
       pathParameters: { userId: 'uid', isAdmin: true },
     };
 
-    authenticate.mockResolvedValue({ userId: 'admin-uid', isAdmin: true });
+    authenticate.mockResolvedValue({ getId: () => 'admin-uid', isAdmin: true });
     forbidden.mockImplementation((cb) => { cb(); });
 
     const responseCb = () => {

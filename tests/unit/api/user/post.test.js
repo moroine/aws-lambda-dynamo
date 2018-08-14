@@ -24,7 +24,7 @@ test('Should return client error if invalid given body', (done) => {
       userId: 'uid',
     },
   };
-  authenticate.mockResolvedValue({ userId: 'uid', isAdmin: true });
+  authenticate.mockResolvedValue({ getId: () => 'uid', isAdmin: true });
 
   parseBody.mockImplementation((body) => {
     expect(body).toBe(event.body);
@@ -42,6 +42,11 @@ test('Should return client error if invalid given body', (done) => {
       body: JSON.stringify({
         error: 'Error from parse',
       }),
+      headers: {
+        'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,PATCH',
+        'Access-Control-Allow-Headers': 'Content-Type,Authorization,X-User-Id',
+        'Access-Control-Allow-Origin': '*',
+      },
     });
 
     done();
@@ -62,7 +67,7 @@ test('Should create a new User', (done) => {
       userId: 'uid',
     },
   };
-  authenticate.mockResolvedValue({ userId: 'uid', isAdmin: true });
+  authenticate.mockResolvedValue({ getId: () => 'uid', isAdmin: true });
 
   parseBody.mockImplementation((body) => {
     expect(body).toBe(event.body);
@@ -93,7 +98,15 @@ test('Should create a new User', (done) => {
     expect(isNew).toBe(true);
 
     expect(err).toBe(null);
-    expect(resp).toEqual({ statusCode: 204, body: null });
+    expect(resp).toEqual({
+      statusCode: 204,
+      body: null,
+      headers: {
+        'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,PATCH',
+        'Access-Control-Allow-Headers': 'Content-Type,Authorization,X-User-Id',
+        'Access-Control-Allow-Origin': '*',
+      },
+    });
 
     done();
   };
@@ -113,7 +126,7 @@ test('Should return client error if saveUser is not success', (done) => {
       userId: 'uid',
     },
   };
-  authenticate.mockResolvedValue({ userId: 'uid', isAdmin: true });
+  authenticate.mockResolvedValue({ getId: () => 'uid', isAdmin: true });
 
   parseBody.mockImplementation((body) => {
     expect(body).toBe(event.body);
@@ -141,7 +154,15 @@ test('Should return client error if saveUser is not success', (done) => {
     expect(isNew).toBe(true);
 
     expect(err).toBe(null);
-    expect(resp).toEqual({ statusCode: 400, body: JSON.stringify({ error: 'Invalid data' }) });
+    expect(resp).toEqual({
+      statusCode: 400,
+      body: JSON.stringify({ error: 'Invalid data' }),
+      headers: {
+        'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,PATCH',
+        'Access-Control-Allow-Headers': 'Content-Type,Authorization,X-User-Id',
+        'Access-Control-Allow-Origin': '*',
+      },
+    });
 
     done();
   };
@@ -162,7 +183,7 @@ test('Should return server error on unexpected error', (done) => {
     },
   };
 
-  authenticate.mockResolvedValue({ userId: 'uid', isAdmin: true });
+  authenticate.mockResolvedValue({ getId: () => 'uid', isAdmin: true });
   parseBody.mockImplementation((body) => {
     expect(body).toBe(event.body);
 
@@ -190,7 +211,15 @@ test('Should return server error on unexpected error', (done) => {
     expect(isNew).toBe(true);
 
     expect(err).toBe(null);
-    expect(resp).toEqual({ statusCode: 500, body: JSON.stringify({ error: 'Internal Server Error' }) });
+    expect(resp).toEqual({
+      statusCode: 500,
+      body: JSON.stringify({ error: 'Internal Server Error' }),
+      headers: {
+        'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,PATCH',
+        'Access-Control-Allow-Headers': 'Content-Type,Authorization,X-User-Id',
+        'Access-Control-Allow-Origin': '*',
+      },
+    });
 
     done();
   };

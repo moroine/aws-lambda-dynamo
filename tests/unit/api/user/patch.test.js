@@ -22,7 +22,7 @@ test('Should return client error if invalid given body', (done) => {
   const event = {
     body: Symbol('event body'),
   };
-  authenticate.mockResolvedValue({ userId: 'uid', isAdmin: true });
+  authenticate.mockResolvedValue({ getId: () => 'uid', isAdmin: true });
 
   parseBody.mockImplementation((body) => {
     expect(body).toBe(event.body);
@@ -40,6 +40,11 @@ test('Should return client error if invalid given body', (done) => {
       body: JSON.stringify({
         error: 'Error from parse',
       }),
+      headers: {
+        'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,PATCH',
+        'Access-Control-Allow-Headers': 'Content-Type,Authorization,X-User-Id',
+        'Access-Control-Allow-Origin': '*',
+      },
     });
 
     done();
@@ -71,13 +76,18 @@ test('Should return not found if user does not exists', (done) => {
   });
 
   getUserById.mockResolvedValue(null);
-  authenticate.mockResolvedValue({ userId: 'uid', isAdmin: true });
+  authenticate.mockResolvedValue({ getId: () => 'uid', isAdmin: true });
 
   const responseCb = (err, resp) => {
     expect(err).toBe(null);
     expect(resp).toEqual({
       statusCode: 404,
       body: JSON.stringify({ error: 'user not found' }),
+      headers: {
+        'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,PATCH',
+        'Access-Control-Allow-Headers': 'Content-Type,Authorization,X-User-Id',
+        'Access-Control-Allow-Origin': '*',
+      },
     });
 
     done();
@@ -97,7 +107,7 @@ test('Should update the user', (done) => {
     },
     body: JSON.stringify(data),
   };
-  authenticate.mockResolvedValue({ userId: 'uid', isAdmin: true });
+  authenticate.mockResolvedValue({ getId: () => 'uid', isAdmin: true });
 
   parseBody.mockImplementation((body) => {
     expect(body).toBe(event.body);
@@ -129,6 +139,11 @@ test('Should update the user', (done) => {
     expect(resp).toEqual({
       statusCode: 204,
       body: null,
+      headers: {
+        'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,PATCH',
+        'Access-Control-Allow-Headers': 'Content-Type,Authorization,X-User-Id',
+        'Access-Control-Allow-Origin': '*',
+      },
     });
 
     done();
@@ -148,7 +163,7 @@ test('Should return client error if saveUser is not success', (done) => {
     },
     body: JSON.stringify(data),
   };
-  authenticate.mockResolvedValue({ userId: 'uid', isAdmin: true });
+  authenticate.mockResolvedValue({ getId: () => 'uid', isAdmin: true });
 
   parseBody.mockImplementation((body) => {
     expect(body).toBe(event.body);
@@ -180,6 +195,11 @@ test('Should return client error if saveUser is not success', (done) => {
     expect(resp).toEqual({
       statusCode: 400,
       body: JSON.stringify({ error: 'Invalid data' }),
+      headers: {
+        'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,PATCH',
+        'Access-Control-Allow-Headers': 'Content-Type,Authorization,X-User-Id',
+        'Access-Control-Allow-Origin': '*',
+      },
     });
 
     done();
@@ -199,7 +219,7 @@ test('Should return internal server error if saveUSer is rejected', (done) => {
     },
     body: JSON.stringify(data),
   };
-  authenticate.mockResolvedValue({ userId: 'uid', isAdmin: true });
+  authenticate.mockResolvedValue({ getId: () => 'uid', isAdmin: true });
 
   parseBody.mockImplementation((body) => {
     expect(body).toBe(event.body);
@@ -220,6 +240,11 @@ test('Should return internal server error if saveUSer is rejected', (done) => {
     expect(resp).toEqual({
       statusCode: 500,
       body: JSON.stringify({ error: 'Internal Server Error' }),
+      headers: {
+        'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,PATCH',
+        'Access-Control-Allow-Headers': 'Content-Type,Authorization,X-User-Id',
+        'Access-Control-Allow-Origin': '*',
+      },
     });
 
     done();
@@ -239,7 +264,7 @@ test('Should return internal server error if getUserById is rejected', (done) =>
     },
     body: JSON.stringify(data),
   };
-  authenticate.mockResolvedValue({ userId: 'uid', isAdmin: true });
+  authenticate.mockResolvedValue({ getId: () => 'uid', isAdmin: true });
   parseBody.mockImplementation((body) => {
     expect(body).toBe(event.body);
 
@@ -256,6 +281,11 @@ test('Should return internal server error if getUserById is rejected', (done) =>
     expect(resp).toEqual({
       statusCode: 500,
       body: JSON.stringify({ error: 'Internal Server Error' }),
+      headers: {
+        'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,PATCH',
+        'Access-Control-Allow-Headers': 'Content-Type,Authorization,X-User-Id',
+        'Access-Control-Allow-Origin': '*',
+      },
     });
 
     done();

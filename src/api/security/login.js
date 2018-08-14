@@ -4,6 +4,7 @@ import { getUserById } from '../../repositories/userRepository';
 import User from '../../model/User';
 import { saveToken } from '../../repositories/tokenRepository';
 import Token from '../../model/Token';
+import { addCorsHeaders } from './cors';
 
 const login = (event, context, callback) => {
   // TODO: test me
@@ -16,6 +17,7 @@ const login = (event, context, callback) => {
       {
         statusCode: 400,
         body: JSON.stringify({ error: result }),
+        headers: addCorsHeaders(),
       },
     );
 
@@ -29,6 +31,7 @@ const login = (event, context, callback) => {
       {
         statusCode: 400,
         body: JSON.stringify({ error: 'Missing email or password' }),
+        headers: addCorsHeaders(),
       },
     );
 
@@ -42,6 +45,7 @@ const login = (event, context, callback) => {
       {
         statusCode: 400,
         body: JSON.stringify({ error: 'Missing email or password' }),
+        headers: addCorsHeaders(),
       },
     );
 
@@ -56,6 +60,7 @@ const login = (event, context, callback) => {
           {
             statusCode: 400,
             body: JSON.stringify({ error: 'Invalid email or password' }),
+            headers: addCorsHeaders(),
           },
         );
 
@@ -69,7 +74,9 @@ const login = (event, context, callback) => {
           callback(
             null,
             {
-              statusCode: 500, body: JSON.stringify({ error: 'Internal Server Error' }),
+              statusCode: 500,
+              body: JSON.stringify({ error: 'Internal Server Error' }),
+              headers: addCorsHeaders(),
             },
           );
 
@@ -81,21 +88,23 @@ const login = (event, context, callback) => {
         const token = new Token({
           userId: uid,
           token: t,
-          ttl: Math.round(d.getTime() / 1000),
+          ttl: Math.round(d.getTime() / 1000) + 3600,
         });
 
-        saveToken(token).then(() => {
-          callback(
-            null,
-            {
-              statusCode: 200,
-              body: JSON.stringify({
-                user: user.serialize(),
-                token: token.serialize(),
-              }),
-            },
-          );
-        });
+        saveToken(token)
+          .then(() => {
+            callback(
+              null,
+              {
+                statusCode: 200,
+                body: JSON.stringify({
+                  user: user.serialize(),
+                  token: token.serialize(),
+                }),
+                headers: addCorsHeaders(),
+              },
+            );
+          });
       });
     });
 };

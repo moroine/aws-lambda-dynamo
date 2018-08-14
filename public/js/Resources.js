@@ -28,7 +28,7 @@ class Resources {
                     app.hideLoading();
                     this.hideCreateModal();
                     this.update();
-                    this.$createForm.reset();
+                    this.$createForm[0].reset();
                 });
         });
 
@@ -41,6 +41,7 @@ class Resources {
                 .then(() => {
                     this.update();
                     app.hideLoading();
+                    this.hideResourcesModal();
                 })
                 .catch((e) => {
                     console.error(e);
@@ -85,7 +86,7 @@ class Resources {
             });
     }
 
-    formatResourcesTable(data) {
+    formatResourcesTable(data, userId = credentials.userId) {
         const html = [];
 
         data.forEach(({id, resourceName}) => {
@@ -97,7 +98,7 @@ class Resources {
                             <button 
                                 type="button" 
                                 class="btn btn-danger resource-remove" 
-                                data-user-id="${credentials.userId}" 
+                                data-user-id="${userId}" 
                                 data-resource-id="${id}"
                             >
                             Remove
@@ -110,11 +111,15 @@ class Resources {
         return html.join('');
     }
 
+    hideResourcesModal() {
+      this.$listModal.modal('hide');
+    }
+
     showResourcesModal(userId) {
         app.showLoading();
         getUserResources(userId)
             .then((data) => {
-                this.$modalTable.html(this.formatResourcesTable(data));
+                this.$modalTable.html(this.formatResourcesTable(data, userId));
                 app.hideLoading();
                 this.$listModal.modal('show');
             })

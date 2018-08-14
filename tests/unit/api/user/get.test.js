@@ -17,7 +17,7 @@ test('Should return the user if found', (done) => {
       id: 42,
     },
   };
-  authenticate.mockResolvedValue({ userId: 'uid', isAdmin: true });
+  authenticate.mockResolvedValue({ getId: () => 'uid', isAdmin: true });
 
   const user = { serialize: jest.fn() };
 
@@ -35,6 +35,11 @@ test('Should return the user if found', (done) => {
     expect(resp).toEqual({
       statusCode: 200,
       body: JSON.stringify({ name: 'u1' }),
+      headers: {
+        'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,PATCH',
+        'Access-Control-Allow-Headers': 'Content-Type,Authorization,X-User-Id',
+        'Access-Control-Allow-Origin': '*',
+      },
     });
 
     done();
@@ -49,7 +54,7 @@ test('Should return 404 if not found', (done) => {
       id: 42,
     },
   };
-  authenticate.mockResolvedValue({ userId: 'uid', isAdmin: true });
+  authenticate.mockResolvedValue({ getId: () => 'uid', isAdmin: true });
 
   getUserById.mockResolvedValue(null);
 
@@ -61,6 +66,11 @@ test('Should return 404 if not found', (done) => {
     expect(resp).toEqual({
       statusCode: 404,
       body: JSON.stringify({ error: 'user not found' }),
+      headers: {
+        'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,PATCH',
+        'Access-Control-Allow-Headers': 'Content-Type,Authorization,X-User-Id',
+        'Access-Control-Allow-Origin': '*',
+      },
     });
 
     done();
@@ -76,7 +86,7 @@ test('Should return server error on unexpected error', (done) => {
     },
   };
 
-  authenticate.mockResolvedValue({ userId: 'uid', isAdmin: true });
+  authenticate.mockResolvedValue({ getId: () => 'uid', isAdmin: true });
   getUserById.mockRejectedValue(new Error('Unexpected'));
 
   const responseCb = (err, resp) => {
@@ -86,6 +96,11 @@ test('Should return server error on unexpected error', (done) => {
     expect(resp).toEqual({
       statusCode: 500,
       body: JSON.stringify({ error: 'Internal Server Error' }),
+      headers: {
+        'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,PATCH',
+        'Access-Control-Allow-Headers': 'Content-Type,Authorization,X-User-Id',
+        'Access-Control-Allow-Origin': '*',
+      },
     });
 
     done();

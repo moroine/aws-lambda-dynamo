@@ -7,17 +7,13 @@ const parseBody = (body) => {
     if (data === null) {
       return {
         success: false,
-        result: {
-          error: 'Body should be a not null object',
-        },
+        result: 'Body should be a not null object',
       };
     }
   } catch (e) {
     return {
       success: false,
-      result: {
-        error: 'Body should be a valid JSON object',
-      },
+      result: 'Body should be a valid JSON object',
     };
   }
 

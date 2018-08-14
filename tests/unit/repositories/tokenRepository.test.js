@@ -124,7 +124,10 @@ test('saveToken should create new token', (done) => {
     expect(docClient.put.mock.calls[0][0]).toEqual({
       TableName: 'my-token-table',
       Item: { name: 'tokenrname' },
-      ConditionExpression: 'attribute_not_exists(token)',
+      ConditionExpression: 'attribute_not_exists(#t)',
+      ExpressionAttributeNames: {
+        '#t': 'token',
+      },
     });
 
     expect(result).toEqual({ success: true, result: null });
@@ -160,7 +163,10 @@ test('saveToken should reject on unexpected error', (done) => {
     expect(docClient.put.mock.calls[0][0]).toEqual({
       TableName: 'my-token-table',
       Item: { token: 'token', userId: 'uid' },
-      ConditionExpression: 'attribute_not_exists(token)',
+      ConditionExpression: 'attribute_not_exists(#t)',
+      ExpressionAttributeNames: {
+        '#t': 'token',
+      },
     });
 
     expect(result).toEqual(error);

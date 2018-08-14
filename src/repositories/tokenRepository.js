@@ -26,9 +26,11 @@ const saveToken = (token) => {
   const params = {
     TableName: getTokenTableName(),
     Item: token.save(),
+    ConditionExpression: 'attribute_not_exists(#t)',
+    ExpressionAttributeNames: {
+      '#t': 'token',
+    },
   };
-
-  params.ConditionExpression = 'attribute_not_exists(token)';
 
   return new Promise((resolve, reject) => {
     docClient.put(params, (err) => {

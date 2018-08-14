@@ -1,3 +1,6 @@
+export { default as login } from './api/security/login';
+export { corsRoute as cors } from './api/security/cors';
+
 export { default as listResource } from './api/resources/list';
 export { default as postResource } from './api/resources/post';
 export { default as deleteResource } from './api/resources/delete';

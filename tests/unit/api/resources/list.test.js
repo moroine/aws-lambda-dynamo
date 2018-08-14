@@ -27,7 +27,7 @@ describe('GET /resource/{userId}', () => {
     const resources = [r1, r2, r3];
 
     const userId = 'uid';
-    authenticate.mockResolvedValue({ userId: 'uid' });
+    authenticate.mockResolvedValue({ getId: () => 'uid' });
     getUserResources.mockResolvedValue(resources);
 
     const responseCb = (err, resp) => {
@@ -42,6 +42,11 @@ describe('GET /resource/{userId}', () => {
           { name: 'resource-2' },
           { name: 'resource-3' },
         ]),
+        headers: {
+          'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,PATCH',
+          'Access-Control-Allow-Headers': 'Content-Type,Authorization,X-User-Id',
+          'Access-Control-Allow-Origin': '*',
+        },
       });
 
       done();
@@ -60,7 +65,7 @@ describe('GET /resource/{userId}', () => {
     };
 
     getUserResources.mockRejectedValue(new Error('Unexpected'));
-    authenticate.mockResolvedValue({ userId: 'uid' });
+    authenticate.mockResolvedValue({ getId: () => 'uid' });
 
     const responseCb = (err, resp) => {
       expect(getUserResources).toHaveBeenCalledTimes(1);
@@ -70,6 +75,11 @@ describe('GET /resource/{userId}', () => {
       expect(resp).toEqual({
         statusCode: 500,
         body: JSON.stringify({ error: 'Internal Server Error' }),
+        headers: {
+          'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,PATCH',
+          'Access-Control-Allow-Headers': 'Content-Type,Authorization,X-User-Id',
+          'Access-Control-Allow-Origin': '*',
+        },
       });
 
       done();
@@ -104,7 +114,7 @@ describe('GET /resource/{userId}', () => {
       pathParameters: { userId: 'uid' },
     };
 
-    authenticate.mockResolvedValue({ userId: 'otherUid' });
+    authenticate.mockResolvedValue({ getId: () => 'otherUid' });
     forbidden.mockImplementation((cb) => { cb(); });
 
     const responseCb = () => {
@@ -124,7 +134,7 @@ describe('GET /resource/{userId}', () => {
       pathParameters: { userId: 'uid' },
     };
 
-    authenticate.mockResolvedValue({ userId: 'uid' });
+    authenticate.mockResolvedValue({ getId: () => 'uid' });
     forbidden.mockImplementation((cb) => { cb(); });
 
     const responseCb = () => {
@@ -142,7 +152,7 @@ describe('GET /resource/{userId}', () => {
       pathParameters: { userId: 'uid', isAdmin: true },
     };
 
-    authenticate.mockResolvedValue({ userId: 'admin-uid', isAdmin: true });
+    authenticate.mockResolvedValue({ getId: () => 'admin-uid', isAdmin: true });
     forbidden.mockImplementation((cb) => { cb(); });
 
     const responseCb = () => {

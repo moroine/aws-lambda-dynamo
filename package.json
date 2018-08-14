@@ -32,8 +32,10 @@
     "lint": "eslint .",
     "start": "npm run start:dynamodb && npm run start:api",
     "start:dynamodb": "docker-compose up -d",
-    "start:api": "sam local start-api --docker-network awslambdadynamo_aws-lambda-dynamo-network --debug",
-    "bootstrap:dynamodb": "./local/bootstrapLocalDynamoDb.sh"
+    "start:api": "sam local start-api --docker-network awslambdadynamo_aws-lambda-dynamo-network --skip-pull-image --debug",
+    "bootstrap:dynamodb": "./local/bootstrapLocalDynamoDb.sh",
+    "package:dev": "sam package --template-file template.yaml --output-template-file packaged.yaml --s3-bucket aws-lambda-dynamo-code-dev --region ap-southeast-1",
+    "deploy:dev": "sam deploy --template-file packaged.yaml --stack-name aws-lambda-dynamo-dev --capabilities CAPABILITY_IAM --region ap-southeast-1"
   },
   "jest": {
     "testEnvironment": "node"
