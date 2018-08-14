@@ -9,7 +9,6 @@ const listResource = (event, context, callback) => {
   authenticate(event, context, callback)
     .then((user) => {
       if (user === null || !(user.isAdmin || user.getId() === userId)) {
-        console.log(`Invalid userId ${userId} - ${user.getId()}`);
         forbidden(callback);
       } else {
         getUserResources(userId)

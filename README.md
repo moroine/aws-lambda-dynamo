@@ -78,3 +78,4 @@ yarn test
 
 - [ ] CORS security issue
 - [ ] No email verification, and password is managed by admin
+- [ ] When removing an user, resources are not removed

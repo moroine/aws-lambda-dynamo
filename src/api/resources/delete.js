@@ -1,4 +1,3 @@
-import querystring from 'querystring';
 import { deleteResource as deleteResourceFromDb } from '../../repositories/resourceRepository';
 import authenticate from '../security/authenticate';
 import forbidden from '../security/forbidden';

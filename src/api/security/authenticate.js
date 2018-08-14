@@ -27,14 +27,12 @@ const authenticate = (event, context, callback) => {
   });
 
   if (!authorizationToken || !userId) {
-    console.log(`Token or userId not found: ${authorizationToken} - ${userId}`);
     return Promise.resolve(null);
   }
 
   return getToken(authorizationToken, userId)
     .then((t) => {
       if (t === null) {
-        console.log(`Token not found:  ${authorizationToken} - ${userId}`);
         return null;
       }
 
@@ -42,7 +40,6 @@ const authenticate = (event, context, callback) => {
     })
     .then((user) => {
       if (user === null) {
-        console.log(`User not found: ${userId}`);
         return null;
       }
 

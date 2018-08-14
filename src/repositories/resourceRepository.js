@@ -1,5 +1,6 @@
 import { getResourceTableName, docClient } from '../db';
 import Resource from '../model/Resource';
+import { getUserById } from './userRepository';
 
 const getUserResources = userId => new Promise((resolve, reject) => {
   const params = {
@@ -21,6 +22,16 @@ const getUserResources = userId => new Promise((resolve, reject) => {
     return resolve(data.Items.map(r => new Resource(r)));
   });
 });
+
+const checkQuota = userId => getUserById(userId)
+  .then(({ quota }) => {
+    if (quota < 0) {
+      return true;
+    }
+
+    return getUserResources(userId)
+      .then(resources => resources.length < quota);
+  });
 
 const saveResource = (resource, isNew) => {
   // TODO: Check quota
@@ -92,6 +103,7 @@ const deleteResource = (userId, id) => {
 };
 
 export {
+  checkQuota,
   getUserResources,
   saveResource,
   deleteResource,
