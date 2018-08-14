@@ -25,8 +25,8 @@ const patchUser = (event, context, callback) => {
           return;
         }
 
-        const { id } = event.pathParameters;
-        getUserById(id)
+        const { userId } = event.pathParameters;
+        getUserById(userId)
           .then((user) => {
             if (user === null) {
               callback(null, {

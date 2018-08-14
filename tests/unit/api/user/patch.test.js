@@ -125,7 +125,7 @@ test('Should update the user', (done) => {
 
   const responseCb = (err, resp) => {
     expect(getUserById).toHaveBeenCalledTimes(1);
-    expect(getUserById.mock.calls[0]).toEqual([event.pathParameters.id]);
+    expect(getUserById.mock.calls[0]).toEqual([event.pathParameters.userId]);
 
     expect(userMock.update).toHaveBeenCalledTimes(1);
     expect(userMock.update.mock.calls[0]).toEqual([data]);
@@ -181,7 +181,7 @@ test('Should return client error if saveUser is not success', (done) => {
 
   const responseCb = (err, resp) => {
     expect(getUserById).toHaveBeenCalledTimes(1);
-    expect(getUserById.mock.calls[0]).toEqual([event.pathParameters.id]);
+    expect(getUserById.mock.calls[0]).toEqual([event.pathParameters.userId]);
 
     expect(userMock.update).toHaveBeenCalledTimes(1);
     expect(userMock.update.mock.calls[0]).toEqual([data]);
@@ -215,7 +215,7 @@ test('Should return internal server error if saveUSer is rejected', (done) => {
 
   const event = {
     pathParameters: {
-      id: 42,
+      userId: 42,
     },
     body: JSON.stringify(data),
   };
@@ -260,7 +260,7 @@ test('Should return internal server error if getUserById is rejected', (done) =>
 
   const event = {
     pathParameters: {
-      id: 42,
+      userId: 42,
     },
     body: JSON.stringify(data),
   };

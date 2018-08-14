@@ -1,11 +1,10 @@
-import querystring from 'querystring';
 import { getUserResources } from '../../repositories/resourceRepository';
 import authenticate from '../security/authenticate';
 import forbidden from '../security/forbidden';
 import { addCorsHeaders } from '../security/cors';
 
 const listResource = (event, context, callback) => {
-  const userId = querystring.escape(event.pathParameters.userId);
+  const { userId } = event.pathParameters;
 
   authenticate(event, context, callback)
     .then((user) => {

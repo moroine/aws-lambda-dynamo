@@ -1,7 +1,7 @@
 import postResource from '../../../../src/api/resources/post';
 import parseBody from '../../../../src/api/helpers/parseBody';
 import Resource from '../../../../src/model/Resource';
-import { saveResource } from '../../../../src/repositories/resourceRepository';
+import { saveResource, checkQuota } from '../../../../src/repositories/resourceRepository';
 import authenticate from '../../../../src/api/security/authenticate';
 import forbidden from '../../../../src/api/security/forbidden';
 
@@ -15,6 +15,7 @@ beforeEach(() => {
   // Clear all instances and calls to constructor and all methods:
   parseBody.mockClear();
   saveResource.mockClear();
+  checkQuota.mockClear();
   Resource.mockClear();
   authenticate.mockClear();
   forbidden.mockClear();
@@ -88,6 +89,8 @@ describe('POST /resource/{userId}', () => {
       result: null,
     });
 
+    checkQuota.mockResolvedValue(true);
+
     const responseCb = (err, resp) => {
       expect(saveResource).toHaveBeenCalledTimes(1);
       expect(Resource).toHaveBeenCalledTimes(1);
@@ -145,6 +148,8 @@ describe('POST /resource/{userId}', () => {
       result: 'Invalid data',
     });
 
+    checkQuota.mockResolvedValue(true);
+
     const responseCb = (err, resp) => {
       expect(saveResource).toHaveBeenCalledTimes(1);
       expect(Resource).toHaveBeenCalledTimes(1);
@@ -198,6 +203,8 @@ describe('POST /resource/{userId}', () => {
     });
 
     saveResource.mockRejectedValue(new Error('Unexpected error'));
+
+    checkQuota.mockResolvedValue(true);
 
     const responseCb = (err, resp) => {
       expect(saveResource).toHaveBeenCalledTimes(1);

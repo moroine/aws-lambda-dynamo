@@ -1,12 +1,10 @@
-import querystring from 'querystring';
 import { deleteResource as deleteResourceFromDb } from '../../repositories/resourceRepository';
 import authenticate from '../security/authenticate';
 import forbidden from '../security/forbidden';
 import { addCorsHeaders } from '../security/cors';
 
 const deleteResource = (event, context, callback) => {
-  const userId = querystring.escape(event.pathParameters.userId);
-  const resourceId = querystring.escape(event.pathParameters.resourceId);
+  const { userId, resourceId } = event.pathParameters;
 
   authenticate(event, context, callback)
     .then((user) => {

@@ -1,5 +1,4 @@
-import querystring from 'querystring';
-import { saveResource } from '../../repositories/resourceRepository';
+import { saveResource, checkQuota } from '../../repositories/resourceRepository';
 import parseBody from '../helpers/parseBody';
 import Resource from '../../model/Resource';
 import authenticate from '../security/authenticate';
@@ -8,7 +7,7 @@ import { addCorsHeaders } from '../security/cors';
 
 const postResource = (event, context, callback) => {
   const { success, result } = parseBody(event.body);
-  const userId = querystring.escape(event.pathParameters.userId);
+  const { userId } = event.pathParameters;
 
   authenticate(event, context, callback)
     .then((user) => {
@@ -30,23 +29,36 @@ const postResource = (event, context, callback) => {
 
         result.userId = userId;
 
-        const resource = new Resource(result);
-
-        saveResource(resource, true)
-          .then(({ success: successSave, result: resultSave }) => {
-            if (successSave) {
-              callback(null, {
-                statusCode: 204,
-                body: null,
-                headers: addCorsHeaders(),
-              });
-            } else {
+        checkQuota(userId)
+          .then((isAllowed) => {
+            if (!isAllowed) {
               callback(null, {
                 statusCode: 400,
-                body: JSON.stringify({ error: resultSave }),
+                body: JSON.stringify({ error: 'Quota reached' }),
                 headers: addCorsHeaders(),
               });
+
+              return Promise.resolve();
             }
+
+            const resource = new Resource(result);
+
+            return saveResource(resource, true)
+              .then(({ success: successSave, result: resultSave }) => {
+                if (successSave) {
+                  callback(null, {
+                    statusCode: 204,
+                    body: null,
+                    headers: addCorsHeaders(),
+                  });
+                } else {
+                  callback(null, {
+                    statusCode: 400,
+                    body: JSON.stringify({ error: resultSave }),
+                    headers: addCorsHeaders(),
+                  });
+                }
+              });
           })
           .catch(() => {
             callback(null, {
