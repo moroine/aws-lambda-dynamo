@@ -1,4 +1,20 @@
-const endpoint = new URL(window.location.href).searchParams.get('endpoint') || 'https://1hnnzaucg7.execute-api.ap-southeast-1.amazonaws.com';
+let endpoint = new URL(window.location.href).searchParams.get('endpoint');
+window.loadStack = fetch('/stack.json')
+  .then((response) => {
+    if (response.ok) {
+      return response.json()
+        .then(([stack]) => {
+          stack.forEach((item) => {
+            if (item.OutputKey === 'Api') {
+              endpoint = endpoint || item.OutputValue;
+            }
+          })
+        })
+    }
+  })
+  .catch((e) => {
+    console.error(e);
+  });
 
 window.credentials = {
   userId: null,
@@ -53,7 +69,7 @@ window.getUserResources = (userId = window.credentials.userId) => {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + window.credentials.token,
-      'X-User-Id': window.credentials.userId,
+      'x-user-id': window.credentials.userId,
     },
   }).then((response) => {
     if (!response.ok) {
@@ -71,7 +87,7 @@ window.deleteResource = (resourceId, userId = window.credentials.userId) => {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + window.credentials.token,
-      'X-User-Id': window.credentials.userId,
+      'x-user-id': window.credentials.userId,
     },
   }).then((response) => {
     if (!response.ok) {
@@ -87,7 +103,7 @@ window.createResource = (data, userId = window.credentials.userId) => {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + window.credentials.token,
-      'X-User-Id': window.credentials.userId,
+      'x-user-id': window.credentials.userId,
     },
     body: JSON.stringify(data)
   }).then((response) => {
@@ -104,7 +120,7 @@ window.createUser = (data) => {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + window.credentials.token,
-      'X-User-Id': window.credentials.userId,
+      'x-user-id': window.credentials.userId,
     },
     body: JSON.stringify(data)
   }).then((response) => {
@@ -121,7 +137,7 @@ window.updateUser = (data) => {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + window.credentials.token,
-      'X-User-Id': window.credentials.userId,
+      'x-user-id': window.credentials.userId,
     },
     body: JSON.stringify(data)
   }).then((response) => {
@@ -138,7 +154,7 @@ window.getUsers = () => {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + window.credentials.token,
-      'X-User-Id': window.credentials.userId,
+      'x-user-id': window.credentials.userId,
     },
   }).then((response) => {
     if (!response.ok) {
@@ -156,7 +172,7 @@ window.deleteUser = (userId) => {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + window.credentials.token,
-      'X-User-Id': window.credentials.userId,
+      'x-user-id': window.credentials.userId,
     },
   }).then((response) => {
     if (!response.ok) {

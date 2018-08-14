@@ -4,14 +4,14 @@ import forbidden from '../security/forbidden';
 import { addCorsHeaders } from '../security/cors';
 
 const getUser = (event, context, callback) => {
-  const { id } = event.pathParameters;
+  const { userId } = event.pathParameters;
 
   authenticate(event, context, callback)
     .then((currentUser) => {
       if (currentUser === null || !currentUser.isAdmin) {
         forbidden(callback);
       } else {
-        getUserById(id)
+        getUserById(userId)
           .then((user) => {
             if (user === null) {
               callback(null, {

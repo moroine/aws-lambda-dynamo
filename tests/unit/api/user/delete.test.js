@@ -14,7 +14,7 @@ beforeEach(() => {
 test('Should return 204 if success', (done) => {
   const event = {
     pathParameters: {
-      id: 'uid',
+      userId: 'uid',
     },
   };
 
@@ -46,7 +46,7 @@ test('Should return 204 if success', (done) => {
 test('Should return server error on unexpected error', (done) => {
   const event = {
     pathParameters: {
-      id: 'uid',
+      userId: 'uid',
     },
   };
 

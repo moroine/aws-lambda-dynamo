@@ -5,19 +5,36 @@ import { addCorsHeaders } from './cors';
 const authenticate = (event, context, callback) => {
   // TODO: test me
 
-  const { Authorization, 'X-User-Id': userId } = event.headers;
-  if (!Authorization || !userId) {
+  const headerKeys = Object.keys(event.headers);
+
+  let authorizationToken = null;
+  let userId = null;
+  headerKeys.forEach((headerKey) => {
+    if (headerKey.toLowerCase() === 'authorization') {
+      const authorization = event.headers[headerKey];
+      const matches = authorization.trim().match(/Bearer (\w+)/i);
+      if (matches) {
+        ([, authorizationToken] = matches);
+      }
+    }
+
+    if (headerKey.toLowerCase() === 'x-user-id') {
+      userId = event.headers[headerKey];
+      if (userId) {
+        userId = userId.trim();
+      }
+    }
+  });
+
+  if (!authorizationToken || !userId) {
+    console.log(`Token or userId not found: ${authorizationToken} - ${userId}`);
     return Promise.resolve(null);
   }
 
-  const matches = Authorization.match(/Bearer (\w+)/i);
-  if (!matches) {
-    return Promise.resolve(null);
-  }
-
-  return getToken(matches[1], userId)
+  return getToken(authorizationToken, userId)
     .then((t) => {
       if (t === null) {
+        console.log(`Token not found:  ${authorizationToken} - ${userId}`);
         return null;
       }
 
@@ -25,6 +42,7 @@ const authenticate = (event, context, callback) => {
     })
     .then((user) => {
       if (user === null) {
+        console.log(`User not found: ${userId}`);
         return null;
       }
 

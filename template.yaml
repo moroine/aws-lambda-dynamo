@@ -241,7 +241,7 @@ Resources:
         GetUer:
           Type: Api
           Properties:
-            Path: /user/{id}
+            Path: /user/{userId}
             Method: get
 
   ListUserFunction:
@@ -298,7 +298,7 @@ Resources:
         PutUser:
           Type: Api
           Properties:
-            Path: /user/{id}
+            Path: /user/{userId}
             Method: patch
 
   DeleteUserFunction:
@@ -317,7 +317,7 @@ Resources:
         DeleteUser:
           Type: Api
           Properties:
-            Path: /user/{id}
+            Path: /user/{userId}
             Method: delete
 
 Outputs:

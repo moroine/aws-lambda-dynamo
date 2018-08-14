@@ -14,7 +14,7 @@ beforeEach(() => {
 test('Should return the user if found', (done) => {
   const event = {
     pathParameters: {
-      id: 42,
+      userId: 42,
     },
   };
   authenticate.mockResolvedValue({ getId: () => 'uid', isAdmin: true });
@@ -51,7 +51,7 @@ test('Should return the user if found', (done) => {
 test('Should return 404 if not found', (done) => {
   const event = {
     pathParameters: {
-      id: 42,
+      userId: 42,
     },
   };
   authenticate.mockResolvedValue({ getId: () => 'uid', isAdmin: true });
@@ -82,7 +82,7 @@ test('Should return 404 if not found', (done) => {
 test('Should return server error on unexpected error', (done) => {
   const event = {
     pathParameters: {
-      id: 42,
+      userId: 42,
     },
   };
 

@@ -1,0 +1,19 @@
+[
+    [
+        {
+            "OutputKey": "Platform",
+            "OutputValue": "http://aws-lambda-dynamo-platform.s3-website-ap-southeast-1.amazonaws.com",
+            "Description": "URL for platform website hosted on S3"
+        },
+        {
+            "OutputKey": "S3BucketSecureURL",
+            "OutputValue": "https://aws-lambda-dynamo-platform.s3.amazonaws.com",
+            "Description": "Name of S3 bucket to hold platform website content"
+        },
+        {
+            "OutputKey": "Api",
+            "OutputValue": "https://1hnnzaucg7.execute-api.ap-southeast-1.amazonaws.com/Prod",
+            "Description": "API Gateway endpoint URL"
+        }
+    ]
+]

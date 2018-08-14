@@ -8,7 +8,7 @@ import { addCorsHeaders } from '../security/cors';
 
 const postResource = (event, context, callback) => {
   const { success, result } = parseBody(event.body);
-  const userId = querystring.escape(event.pathParameters.userId);
+  const { userId } = event.pathParameters;
 
   authenticate(event, context, callback)
     .then((user) => {
