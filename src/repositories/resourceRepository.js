@@ -23,6 +23,7 @@ const getUserResources = userId => new Promise((resolve, reject) => {
 });
 
 const saveResource = (resource, isNew) => {
+  // TODO: Check quota
   const { valid, error } = resource.validate();
 
   if (!valid) {
@@ -64,7 +65,7 @@ const saveResource = (resource, isNew) => {
   });
 };
 
-const deleteResource = (id) => {
+const deleteResource = (userId, id) => {
   const resourceName = Resource.getNameFromId(id);
 
   if (resourceName === null) {
@@ -74,7 +75,7 @@ const deleteResource = (id) => {
   return new Promise((resolve, reject) => {
     const params = {
       TableName: getResourceTableName(),
-      Key: { resourceName },
+      Key: { resourceName, userId },
     };
 
     docClient.delete(params, (err) => {

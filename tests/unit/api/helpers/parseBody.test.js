@@ -16,9 +16,7 @@ test('Should return error for not valid JSON', () => {
 
   expect(parseBody(json)).toEqual({
     success: false,
-    result: {
-      error: 'Body should be a valid JSON object',
-    },
+    result: 'Body should be a valid JSON object',
   });
 });
 
@@ -27,8 +25,6 @@ test('Should return error if null', () => {
 
   expect(parseBody(json)).toEqual({
     success: false,
-    result: {
-      error: 'Body should be a not null object',
-    },
+    result: 'Body should be a not null object',
   });
 });

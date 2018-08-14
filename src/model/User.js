@@ -36,6 +36,22 @@ class User {
     this.update(data);
   }
 
+  isValidPassword(email, password) {
+    if (typeof email !== 'string') {
+      return false;
+    }
+
+    const mail = validator.normalizeEmail(
+      validator.trim(email),
+    );
+
+    if (mail !== this.email) {
+      return false;
+    }
+
+    return bcryptjs.compareSync(password, this.getEncodedPassword());
+  }
+
   update(data) {
     if (typeof data.email === 'string') {
       this.email = validator.normalizeEmail(

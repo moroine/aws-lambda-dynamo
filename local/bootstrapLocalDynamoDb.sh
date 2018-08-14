@@ -30,3 +30,25 @@ aws dynamodb create-table \
 --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5 \
 --endpoint http://0.0.0.0:9000
 
+echo "delete token table"
+aws dynamodb delete-table \
+--table-name aws-lambda-dynamo-table-token \
+--endpoint http://0.0.0.0:9000 2> /dev/null
+
+echo "create token table"
+aws dynamodb create-table \
+--table-name aws-lambda-dynamo-table-token \
+--attribute-definitions AttributeName=token,AttributeType=S AttributeName=userId,AttributeType=S \
+--key-schema AttributeName=token,KeyType=HASH AttributeName=userId,KeyType=RANGE \
+--provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5 \
+--endpoint http://0.0.0.0:9000
+
+aws dynamodb update-time-to-live \
+--table-name aws-lambda-dynamo-table-token \
+--time-to-live-specification "Enabled=true, AttributeName=ttl" \
+--endpoint http://0.0.0.0:9000
+
+aws dynamodb put-item \
+--table-name aws-lambda-dynamo-table-user \
+--item '{ "email": { "S": "admin@mail.com" }, "quota": { "N": "-1" }, "isAdmin": { "BOOL": true }, "id": { "S": "YWRtaW5AbWFpbC5jb20%3D" }, "encodedPassword": { "S": "$2a$05$Zh73J5cprfDgpY6fOqbOkelC6.6D9XYX6PIqkq06ULTgElPWBqwvm" }}' \
+--endpoint http://0.0.0.0:9000

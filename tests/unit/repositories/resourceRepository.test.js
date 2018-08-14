@@ -355,17 +355,18 @@ test('deleteResource should delete resource', (done) => {
   getResourceTableName.mockReturnValue('my-resource-table');
 
   const resourceId = 'resource-id';
+  const userId = 'user-id';
   const resourceName = 'resource-name-here';
 
   Resource.getNameFromId.mockReturnValue(resourceName);
 
   docClient.delete.mockImplementation((params, cb) => {
-    expect(params).toEqual({ TableName: 'my-resource-table', Key: { resourceName } });
+    expect(params).toEqual({ TableName: 'my-resource-table', Key: { userId, resourceName } });
 
     cb(null, null);
   });
 
-  const promise = deleteResource(resourceId);
+  const promise = deleteResource(userId, resourceId);
 
   expect(promise).toBeInstanceOf(Promise);
 
@@ -382,11 +383,12 @@ test('deleteResource should delete resource', (done) => {
 test('deleteResource should resolves when cannot retrieve resourceName from id', (done) => {
   getResourceTableName.mockReturnValue('my-resource-table');
 
+  const userId = 'user-id';
   const resourceId = 'resource-id';
 
   Resource.getNameFromId.mockReturnValue(null);
 
-  const promise = deleteResource(resourceId);
+  const promise = deleteResource(userId, resourceId);
 
   expect(promise).toBeInstanceOf(Promise);
 
@@ -401,6 +403,7 @@ test('deleteResource should resolves when cannot retrieve resourceName from id',
 });
 
 test('deleteResource should reject on unexpected error', (done) => {
+  const userId = 'user-id';
   const resourceId = 'resource-id';
   const resourceName = 'resource-name-here';
 
@@ -411,14 +414,14 @@ test('deleteResource should reject on unexpected error', (done) => {
   const error = new Error('Unexpected');
 
   docClient.delete.mockImplementation((params, cb) => {
-    expect(params).toEqual({ TableName: 'my-resource-table', Key: { resourceName } });
+    expect(params).toEqual({ TableName: 'my-resource-table', Key: { userId, resourceName } });
 
     cb(error, null);
   });
 
   const restoreConsole = mockConsole();
 
-  const promise = deleteResource(resourceId);
+  const promise = deleteResource(userId, resourceId);
 
   expect(promise).toBeInstanceOf(Promise);
 

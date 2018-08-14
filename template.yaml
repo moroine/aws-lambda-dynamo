@@ -7,9 +7,28 @@ Description: >
 
 Globals:
   Function:
-    Timeout: 3
+    Timeout: 5
+    MemorySize: 256
 
 Resources:
+
+  Front:
+    Type: AWS::S3::Bucket
+    Properties:
+      AccessControl: PublicRead
+      BucketName: 'aws-lambda-dynamo-platform'
+      CorsConfiguration:
+        CorsRules:
+        - AllowedOrigins:
+            - '*'
+          AllowedMethods:
+            - 'GET'
+            - 'POST'
+            - 'PUT'
+            - 'DELETE'
+      WebsiteConfiguration:
+        IndexDocument: 'index.html'
+        ErrorDocument: 'index.html'
 
   DynamoDBTableResource:
     Type: AWS::DynamoDB::Table
@@ -21,13 +40,34 @@ Resources:
       - AttributeName: resourceName
         AttributeType: S
       KeySchema:
+      - AttributeName: resourceName
+        KeyType: HASH
       - AttributeName: userId
         KeyType: RANGE
-      - AttributeName: resourceId
-        KeyType: HASH
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
+
+  DynamoDBTableToken:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: 'aws-lambda-dynamo-table-token'
+      AttributeDefinitions:
+      - AttributeName: token
+        AttributeType: S
+      - AttributeName: userId
+        AttributeType: S
+      KeySchema:
+      - AttributeName: token
+        KeyType: HASH
+      - AttributeName: userId
+        KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      TimeToLiveSpecification:
+        AttributeName: ttl
+        Enabled: true
 
   DynamoDBTableUser:
     Type: AWS::DynamoDB::Table
@@ -43,6 +83,91 @@ Resources:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
 
+  CorsLoginFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: build
+      Handler: index.cors
+      Runtime: nodejs8.10
+      Events:
+        PostResource:
+          Type: Api
+          Properties:
+            Path: /login
+            Method: options
+
+  CorsResourceFunction1:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: build
+      Handler: index.cors
+      Runtime: nodejs8.10
+      Events:
+        PostResource:
+          Type: Api
+          Properties:
+            Path: /resource/{userId}
+            Method: options
+
+  CorsResourceFunction2:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: build
+      Handler: index.cors
+      Runtime: nodejs8.10
+      Events:
+        PostResource:
+          Type: Api
+          Properties:
+            Path: /resource/{userId}/{resourceId}
+            Method: options
+
+  CorsUserFunction1:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: build
+      Handler: index.cors
+      Runtime: nodejs8.10
+      Events:
+        PostResource:
+          Type: Api
+          Properties:
+            Path: /user
+            Method: options
+
+  CorsUserFunction2:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: build
+      Handler: index.cors
+      Runtime: nodejs8.10
+      Events:
+        PostResource:
+          Type: Api
+          Properties:
+            Path: /user/{userId}
+            Method: options
+
+
+  LoginFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: build
+      Handler: index.login
+      Runtime: nodejs8.10
+      Policies: AmazonDynamoDBFullAccess
+      Environment:
+        Variables:
+          TABLE_RESOURCE: 'aws-lambda-dynamo-table-resource'
+          TABLE_USER: 'aws-lambda-dynamo-table-user'
+          TABLE_TOKEN: 'aws-lambda-dynamo-table-token'
+      Events:
+        PostResource:
+          Type: Api
+          Properties:
+            Path: /login
+            Method: post
+
   ListResourceFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -54,6 +179,7 @@ Resources:
         Variables:
           TABLE_RESOURCE: 'aws-lambda-dynamo-table-resource'
           TABLE_USER: 'aws-lambda-dynamo-table-user'
+          TABLE_TOKEN: 'aws-lambda-dynamo-table-token'
       Events:
         ListResource:
           Type: Api
@@ -72,6 +198,7 @@ Resources:
         Variables:
           TABLE_RESOURCE: 'aws-lambda-dynamo-table-resource'
           TABLE_USER: 'aws-lambda-dynamo-table-user'
+          TABLE_TOKEN: 'aws-lambda-dynamo-table-token'
       Events:
         PostResource:
           Type: Api
@@ -90,6 +217,7 @@ Resources:
         Variables:
           TABLE_RESOURCE: 'aws-lambda-dynamo-table-resource'
           TABLE_USER: 'aws-lambda-dynamo-table-user'
+          TABLE_TOKEN: 'aws-lambda-dynamo-table-token'
       Events:
         DeleteResource:
           Type: Api
@@ -108,6 +236,7 @@ Resources:
         Variables:
           TABLE_RESOURCE: 'aws-lambda-dynamo-table-resource'
           TABLE_USER: 'aws-lambda-dynamo-table-user'
+          TABLE_TOKEN: 'aws-lambda-dynamo-table-token'
       Events:
         GetUer:
           Type: Api
@@ -126,6 +255,7 @@ Resources:
         Variables:
           TABLE_RESOURCE: 'aws-lambda-dynamo-table-resource'
           TABLE_USER: 'aws-lambda-dynamo-table-user'
+          TABLE_TOKEN: 'aws-lambda-dynamo-table-token'
       Events:
         ListUser:
           Type: Api
@@ -144,6 +274,7 @@ Resources:
         Variables:
           TABLE_RESOURCE: 'aws-lambda-dynamo-table-resource'
           TABLE_USER: 'aws-lambda-dynamo-table-user'
+          TABLE_TOKEN: 'aws-lambda-dynamo-table-token'
       Events:
         PostUser:
           Type: Api
@@ -162,6 +293,7 @@ Resources:
         Variables:
           TABLE_RESOURCE: 'aws-lambda-dynamo-table-resource'
           TABLE_USER: 'aws-lambda-dynamo-table-user'
+          TABLE_TOKEN: 'aws-lambda-dynamo-table-token'
       Events:
         PutUser:
           Type: Api
@@ -180,6 +312,7 @@ Resources:
         Variables:
           TABLE_RESOURCE: 'aws-lambda-dynamo-table-resource'
           TABLE_USER: 'aws-lambda-dynamo-table-user'
+          TABLE_TOKEN: 'aws-lambda-dynamo-table-token'
       Events:
         DeleteUser:
           Type: Api
@@ -191,4 +324,18 @@ Outputs:
 
   Api:
     Description: "API Gateway endpoint URL"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
+
+  Platform:
+    Value: !GetAtt
+    - Front
+    - WebsiteURL
+    Description: URL for platform website hosted on S3
+  S3BucketSecureURL:
+    Value: !Join
+    - ''
+    - - 'https://'
+      - !GetAtt
+        - Front
+        - DomainName
+    Description: Name of S3 bucket to hold platform website content
