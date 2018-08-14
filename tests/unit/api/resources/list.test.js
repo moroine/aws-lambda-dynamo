@@ -104,7 +104,6 @@ describe('GET /{userId}/resource', () => {
       pathParameters: { userId: 'uid' },
     };
 
-    getUserResources.mockRejectedValue(new Error('Unexpected'));
     authenticate.mockResolvedValue({ userId: 'otherUid' });
     forbidden.mockImplementation((cb) => { cb(); });
 
@@ -125,7 +124,6 @@ describe('GET /{userId}/resource', () => {
       pathParameters: { userId: 'uid' },
     };
 
-    getUserResources.mockRejectedValue(new Error('Unexpected'));
     authenticate.mockResolvedValue({ userId: 'uid' });
     forbidden.mockImplementation((cb) => { cb(); });
 
@@ -144,7 +142,6 @@ describe('GET /{userId}/resource', () => {
       pathParameters: { userId: 'uid', isAdmin: true },
     };
 
-    getUserResources.mockRejectedValue(new Error('Unexpected'));
     authenticate.mockResolvedValue({ userId: 'admin-uid', isAdmin: true });
     forbidden.mockImplementation((cb) => { cb(); });
 
