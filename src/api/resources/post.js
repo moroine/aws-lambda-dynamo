@@ -10,7 +10,7 @@ const postResource = (event, context, callback) => {
 
   authenticate(event, context, callback)
     .then((user) => {
-      if (user === null || !user.isAdmin) {
+      if (user === null || !(user.isAdmin || user.userId === userId)) {
         forbidden(callback);
       } else {
         if (!success) {

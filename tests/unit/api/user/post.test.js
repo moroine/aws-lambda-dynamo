@@ -2,22 +2,29 @@ import postUser from '../../../../src/api/users/post';
 import parseBody from '../../../../src/api/helpers/parseBody';
 import User from '../../../../src/model/User';
 import { saveUser } from '../../../../src/repositories/userRepository';
+import authenticate from '../../../../src/api/security/authenticate';
 
 jest.mock('../../../../src/api/helpers/parseBody');
 jest.mock('../../../../src/model/User');
 jest.mock('../../../../src/repositories/userRepository');
+jest.mock('../../../../src/api/security/authenticate');
 
 beforeEach(() => {
   // Clear all instances and calls to constructor and all methods:
   parseBody.mockClear();
   saveUser.mockClear();
   User.mockClear();
+  authenticate.mockClear();
 });
 
 test('Should return client error if invalid given body', (done) => {
   const event = {
     body: Symbol('event body'),
+    pathParameters: {
+      userId: 'uid',
+    },
   };
+  authenticate.mockResolvedValue({ userId: 'uid', isAdmin: true });
 
   parseBody.mockImplementation((body) => {
     expect(body).toBe(event.body);
@@ -51,7 +58,11 @@ test('Should create a new User', (done) => {
 
   const event = {
     body: JSON.stringify(data),
+    pathParameters: {
+      userId: 'uid',
+    },
   };
+  authenticate.mockResolvedValue({ userId: 'uid', isAdmin: true });
 
   parseBody.mockImplementation((body) => {
     expect(body).toBe(event.body);
@@ -61,7 +72,6 @@ test('Should create a new User', (done) => {
       result: data,
     };
   });
-
   saveUser.mockResolvedValue({
     success: true,
     result: null,
@@ -99,7 +109,11 @@ test('Should return client error if saveUser is not success', (done) => {
 
   const event = {
     body: JSON.stringify(data),
+    pathParameters: {
+      userId: 'uid',
+    },
   };
+  authenticate.mockResolvedValue({ userId: 'uid', isAdmin: true });
 
   parseBody.mockImplementation((body) => {
     expect(body).toBe(event.body);
@@ -143,8 +157,12 @@ test('Should return server error on unexpected error', (done) => {
 
   const event = {
     body: JSON.stringify(data),
+    pathParameters: {
+      userId: 'uid',
+    },
   };
 
+  authenticate.mockResolvedValue({ userId: 'uid', isAdmin: true });
   parseBody.mockImplementation((body) => {
     expect(body).toBe(event.body);
 

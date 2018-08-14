@@ -1,11 +1,14 @@
 import listResource from '../../../../src/api/resources/list';
 import { getUserResources } from '../../../../src/repositories/resourceRepository';
+import authenticate from '../../../../src/api/security/authenticate';
 
 jest.mock('../../../../src/repositories/resourceRepository');
+jest.mock('../../../../src/api/security/authenticate');
 
 beforeEach(() => {
   // Clear all instances and calls to constructor and all methods:
   getUserResources.mockClear();
+  authenticate.mockClear();
 });
 
 test('Should return all resources', (done) => {
@@ -19,13 +22,13 @@ test('Should return all resources', (done) => {
 
   const resources = [r1, r2, r3];
 
-  const userId = 42;
-
+  const userId = 'uid';
+  authenticate.mockResolvedValue({ userId: 'uid' });
   getUserResources.mockResolvedValue(resources);
 
   const responseCb = (err, resp) => {
     expect(getUserResources).toHaveBeenCalledTimes(1);
-    expect(getUserResources.mock.calls[0]).toEqual([42]);
+    expect(getUserResources.mock.calls[0]).toEqual(['uid']);
 
     expect(err).toBe(null);
     expect(resp).toEqual({
@@ -48,11 +51,16 @@ test('Should return all resources', (done) => {
 });
 
 test('Should return server error on unexpected error', (done) => {
+  const event = {
+    pathParameters: { userId: 'uid' },
+  };
+
   getUserResources.mockRejectedValue(new Error('Unexpected'));
+  authenticate.mockResolvedValue({ userId: 'uid' });
 
   const responseCb = (err, resp) => {
     expect(getUserResources).toHaveBeenCalledTimes(1);
-    expect(getUserResources.mock.calls[0]).toEqual([42]);
+    expect(getUserResources.mock.calls[0]).toEqual(['uid']);
 
     expect(err).toBe(null);
     expect(resp).toEqual({
@@ -61,9 +69,6 @@ test('Should return server error on unexpected error', (done) => {
     });
 
     done();
-  };
-  const event = {
-    pathParameters: { userId: 42 },
   };
 
   listResource(event, null, responseCb);

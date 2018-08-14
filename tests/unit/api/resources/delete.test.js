@@ -1,11 +1,14 @@
 import deleteResource from '../../../../src/api/resources/delete';
 import { deleteResource as deleteResourceFromDb } from '../../../../src/repositories/resourceRepository';
+import authenticate from '../../../../src/api/security/authenticate';
 
 jest.mock('../../../../src/repositories/resourceRepository');
+jest.mock('../../../../src/api/security/authenticate');
 
 beforeEach(() => {
   // Clear all instances and calls to constructor and all methods:
   deleteResourceFromDb.mockClear();
+  authenticate.mockClear();
 });
 
 test('Should return 204 if success', (done) => {
@@ -15,6 +18,8 @@ test('Should return 204 if success', (done) => {
       resourceId: 'res-id',
     },
   };
+
+  authenticate.mockResolvedValue({ userId: 'uid', isAdmin: true });
 
   deleteResourceFromDb.mockResolvedValue();
 
@@ -41,6 +46,8 @@ test('Should return server error on unexpected error', (done) => {
       resourceId: 'res-id',
     },
   };
+
+  authenticate.mockResolvedValue({ userId: 'uid', isAdmin: true });
 
   deleteResourceFromDb.mockRejectedValue(new Error('Unexpected'));
 

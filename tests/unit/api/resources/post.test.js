@@ -2,16 +2,19 @@ import postResource from '../../../../src/api/resources/post';
 import parseBody from '../../../../src/api/helpers/parseBody';
 import Resource from '../../../../src/model/Resource';
 import { saveResource } from '../../../../src/repositories/resourceRepository';
+import authenticate from '../../../../src/api/security/authenticate';
 
 jest.mock('../../../../src/api/helpers/parseBody');
 jest.mock('../../../../src/model/Resource');
 jest.mock('../../../../src/repositories/resourceRepository');
+jest.mock('../../../../src/api/security/authenticate');
 
 beforeEach(() => {
   // Clear all instances and calls to constructor and all methods:
   parseBody.mockClear();
   saveResource.mockClear();
   Resource.mockClear();
+  authenticate.mockClear();
 });
 
 test('Should return client error if invalid given body', (done) => {
@@ -21,6 +24,8 @@ test('Should return client error if invalid given body', (done) => {
       userId: 'my-user-id',
     },
   };
+
+  authenticate.mockResolvedValue({ userId: 'my-user-id' });
 
   parseBody.mockImplementation((body) => {
     expect(body).toBe(event.body);
@@ -50,6 +55,8 @@ test('Should create a new Resource', (done) => {
   const data = {
     name: 'this is a resource',
   };
+
+  authenticate.mockResolvedValue({ userId: 'my-user-id' });
 
   const event = {
     body: JSON.stringify(data),
@@ -105,6 +112,8 @@ test('Should return client error if saveResource is not success', (done) => {
     },
   };
 
+  authenticate.mockResolvedValue({ userId: 'my-user-id' });
+
   parseBody.mockImplementation((body) => {
     expect(body).toBe(event.body);
 
@@ -151,6 +160,8 @@ test('Should return server error on unexpected error', (done) => {
       userId: 'my-user-id',
     },
   };
+
+  authenticate.mockResolvedValue({ userId: 'my-user-id' });
 
   parseBody.mockImplementation((body) => {
     expect(body).toBe(event.body);

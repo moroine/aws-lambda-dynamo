@@ -2,10 +2,12 @@ import patchUser from '../../../../src/api/users/patch';
 import User from '../../../../src/model/User';
 import parseBody from '../../../../src/api/helpers/parseBody';
 import { getUserById, saveUser } from '../../../../src/repositories/userRepository';
+import authenticate from '../../../../src/api/security/authenticate';
 
 jest.mock('../../../../src/api/helpers/parseBody');
 jest.mock('../../../../src/model/User');
 jest.mock('../../../../src/repositories/userRepository');
+jest.mock('../../../../src/api/security/authenticate');
 
 beforeEach(() => {
   // Clear all instances and calls to constructor and all methods:
@@ -13,12 +15,14 @@ beforeEach(() => {
   saveUser.mockClear();
   getUserById.mockClear();
   User.mockClear();
+  authenticate.mockClear();
 });
 
 test('Should return client error if invalid given body', (done) => {
   const event = {
     body: Symbol('event body'),
   };
+  authenticate.mockResolvedValue({ userId: 'uid', isAdmin: true });
 
   parseBody.mockImplementation((body) => {
     expect(body).toBe(event.body);
@@ -67,6 +71,7 @@ test('Should return not found if user does not exists', (done) => {
   });
 
   getUserById.mockResolvedValue(null);
+  authenticate.mockResolvedValue({ userId: 'uid', isAdmin: true });
 
   const responseCb = (err, resp) => {
     expect(err).toBe(null);
@@ -92,6 +97,7 @@ test('Should update the user', (done) => {
     },
     body: JSON.stringify(data),
   };
+  authenticate.mockResolvedValue({ userId: 'uid', isAdmin: true });
 
   parseBody.mockImplementation((body) => {
     expect(body).toBe(event.body);
@@ -142,6 +148,7 @@ test('Should return client error if saveUser is not success', (done) => {
     },
     body: JSON.stringify(data),
   };
+  authenticate.mockResolvedValue({ userId: 'uid', isAdmin: true });
 
   parseBody.mockImplementation((body) => {
     expect(body).toBe(event.body);
@@ -192,6 +199,7 @@ test('Should return internal server error if saveUSer is rejected', (done) => {
     },
     body: JSON.stringify(data),
   };
+  authenticate.mockResolvedValue({ userId: 'uid', isAdmin: true });
 
   parseBody.mockImplementation((body) => {
     expect(body).toBe(event.body);
@@ -231,7 +239,7 @@ test('Should return internal server error if getUserById is rejected', (done) =>
     },
     body: JSON.stringify(data),
   };
-
+  authenticate.mockResolvedValue({ userId: 'uid', isAdmin: true });
   parseBody.mockImplementation((body) => {
     expect(body).toBe(event.body);
 

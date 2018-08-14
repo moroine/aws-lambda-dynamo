@@ -7,7 +7,7 @@ const listResource = (event, context, callback) => {
 
   authenticate(event, context, callback)
     .then((user) => {
-      if (user === null || !user.isAdmin || user.userId !== userId) {
+      if (user === null || !(user.isAdmin || user.userId === userId)) {
         forbidden(callback);
       } else {
         getUserResources(userId)

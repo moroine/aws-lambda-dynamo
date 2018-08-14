@@ -6,7 +6,7 @@ import { saveToken } from '../../repositories/tokenRepository';
 import Token from '../../model/Token';
 
 const login = (event, context, callback) => {
-    // TODO: test me
+  // TODO: test me
 
   const { success, result } = parseBody(event.body);
 
