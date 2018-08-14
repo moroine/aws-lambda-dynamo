@@ -14,7 +14,7 @@ beforeEach(() => {
   forbidden.mockClear();
 });
 
-describe('GET /{userId}/resource', () => {
+describe('GET /resource/{userId}', () => {
   test('Should return all resources', (done) => {
     const r1 = { serialize: jest.fn() };
     const r2 = { serialize: jest.fn() };

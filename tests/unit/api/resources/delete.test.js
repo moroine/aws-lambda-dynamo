@@ -14,7 +14,7 @@ beforeEach(() => {
   forbidden.mockClear();
 });
 
-describe('DELETE /{userId}/resource/{resourceId}', () => {
+describe('DELETE /resource/{userId}/{resourceId}', () => {
   test('Should return 204 if success', (done) => {
     const event = {
       pathParameters: {
