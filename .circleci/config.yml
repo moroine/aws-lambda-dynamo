@@ -58,6 +58,7 @@ jobs:
                 root: ~/repo
                 paths:
                     - build
+                    - public
                     - template.yaml
     deploy:
         working_directory: ~/repo
