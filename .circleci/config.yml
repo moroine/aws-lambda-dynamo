@@ -73,7 +73,7 @@ jobs:
                 command: sudo pip install awscli aws-sam-cli
             - run: sam package --template-file template.yaml --output-template-file packaged.yaml --s3-bucket aws-lambda-dynamo-code --region ap-southeast-1
             - run: sam deploy --template-file packaged.yaml --stack-name aws-lambda-dynamo --capabilities CAPABILITY_IAM --region ap-southeast-1
-            - run: aws cloudformation describe-stacks --stack-name aws-lambda-dynamo --query 'Stacks[].Outputs' > public/stack.json
+            - run: aws cloudformation describe-stacks --stack-name aws-lambda-dynamo --query 'Stacks[].Outputs' --region ap-southeast-1 > public/stack.json
             - run: aws s3 sync public s3://aws-lambda-dynamo-platform --quiet --acl public-read --region ap-southeast-1
 
 workflows:
